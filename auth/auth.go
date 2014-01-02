@@ -15,7 +15,7 @@ import (
 var (
 	clientId     = flag.String("id", "", "Client ID")
 	clientSecret = flag.String("secret", "", "Client Secret")
-	scope        = flag.String("scope", "flow, private, manage, profile, offline_access", "OAuth scope")
+	scope        = flag.String("scope", "flow private manage profile offline_access", "OAuth scope")
 	redirectURL  = flag.String("redirect_url", "urn:ietf:wg:oauth:2.0:oob", "Redirect URL")
 	authURL      = flag.String("auth_url", "https://api.flowdock.com/oauth/authorize", "Authentication URL")
 	tokenURL     = flag.String("token_url", "https://api.flowdock.com/oauth/token", "Token URL")

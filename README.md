@@ -26,7 +26,7 @@ t := &oauth.Transport{
 
 client := flowdock.NewClient(t.Client())
 
-// list all flows he authenticated user is or can join
+// list all flows the authenticated user is a member of or can join
 flows, _, err := client.Flows.List(true, nil)
 ```
 
@@ -54,7 +54,7 @@ lib or go-github as a guide.
 This library is distributed under the BSD-style license found in the [LICENSE](./LICENSE)
 file.
 
-[Flowdock API]: http://developer.github.com/v3/
+[Flowdock API]: https://www.flowdock.com/api
 [goauth2]: https://code.google.com/p/goauth2/
 [goauth2 docs]: http://godoc.org/code.google.com/p/goauth2/oauth
 [personal API token]: https://flowdock.com/account/authorized_applications

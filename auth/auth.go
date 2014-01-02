@@ -1,3 +1,4 @@
+// Basic OAuth2 command line helper.
 // This code is based on the example found at https://code.google.com/p/goauth2/source/browse/oauth/example/oauthreq.go
 // See LICENSE-GOOGLE
 

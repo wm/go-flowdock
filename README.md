@@ -3,6 +3,8 @@
 go-flowdock is Go client library for accessing the [Flowdock API][].
 
 [![GoDoc](https://godoc.org/github.com/wm/go-flowdock/flowdock?status.png)](https://godoc.org/github.com/wm/go-flowdock/flowdock)
+[![Build Status](https://travis-ci.org/wm/go-flowdock.png?branch=master)](https://travis-ci.org/wm/go-flowdock)
+[![Coverage Status](https://coveralls.io/repos/wm/go-flowdock/badge.png)](https://coveralls.io/r/wm/go-flowdock)
 
 go-flowdock requires Go version 1.1 or greater.
 

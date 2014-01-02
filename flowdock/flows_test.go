@@ -1,11 +1,11 @@
 package flowdock
 
 import (
-	"net/http"
-	"fmt"
-	"testing"
-	"reflect"
 	"encoding/json"
+	"fmt"
+	"net/http"
+	"reflect"
+	"testing"
 )
 
 func TestFlowsService_List(t *testing.T) {

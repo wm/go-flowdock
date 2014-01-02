@@ -5,12 +5,12 @@
 package auth
 
 import (
-	"flag"
-	"os"
-	"log"
-	"fmt"
-	"net/http"
 	"code.google.com/p/goauth2/oauth"
+	"flag"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
 )
 
 var (
@@ -82,5 +82,5 @@ func AuthenticationRequest() *http.Client {
 	transport.Token = token
 	client := transport.Client()
 
-    return client
+	return client
 }

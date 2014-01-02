@@ -3,9 +3,9 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"github.com/wm/go-flowdock/flowdock"
 	"github.com/wm/go-flowdock/auth"
+	"github.com/wm/go-flowdock/flowdock"
+	"log"
 )
 
 func main() {
@@ -69,4 +69,3 @@ func displayFlowData(flow flowdock.Flow) {
 	org := flow.Organization
 	fmt.Println("Flow:", flow.Id, flow.Name, org.Name, flow.Url)
 }
-

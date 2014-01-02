@@ -1,8 +1,8 @@
 package flowdock
 
 import (
-	"net/http"
 	"fmt"
+	"net/http"
 )
 
 // FlowsService handles communication with the flow related methods of the
@@ -15,19 +15,19 @@ type FlowsService struct {
 
 // Flow represents a Flowdock flow (room).
 type Flow struct {
-	Id                 string       `json:"id,omitempty"`
-	Name               string       `json:"name,omitempty"`
-	ParameterizedName  string       `json:"parameterized_name,omitempty"`
-	UnreadMentions     int64        `json:"unread_mentions,omitempty"`
-	Open               bool         `json:"open,omitempty"`
-	Disabled           bool         `json:"disabled,omitempty"`
-	Joined             bool         `json:"joined,omitempty"`
-	Url                string       `json:"url,omitempty"`
-	WebUrl             string       `json:"web_url,omitempty"`
-	JoinUrl            string       `json:"join_url,omitempty"`
-	AccessMode         string       `json:"access_mode,omitempty"`
-	Organization       Organization `json:"organization,omitempty"`
-	Users              []User       `json:"users,omitempty"`
+	Id                string       `json:"id,omitempty"`
+	Name              string       `json:"name,omitempty"`
+	ParameterizedName string       `json:"parameterized_name,omitempty"`
+	UnreadMentions    int64        `json:"unread_mentions,omitempty"`
+	Open              bool         `json:"open,omitempty"`
+	Disabled          bool         `json:"disabled,omitempty"`
+	Joined            bool         `json:"joined,omitempty"`
+	Url               string       `json:"url,omitempty"`
+	WebUrl            string       `json:"web_url,omitempty"`
+	JoinUrl           string       `json:"join_url,omitempty"`
+	AccessMode        string       `json:"access_mode,omitempty"`
+	Organization      Organization `json:"organization,omitempty"`
+	Users             []User       `json:"users,omitempty"`
 }
 
 // FlowsListOptions specifies the optional parameters to the FlowsService.List
@@ -53,7 +53,7 @@ type FlowsCreateOptions struct {
 // Lists the flows that the authenticated user is a member of.
 //
 // Flowdock API docs: https://www.flowdock.com/api/flows
-func (s* FlowsService) List(all bool, opt *FlowsListOptions) ([]Flow, *http.Response, error) {
+func (s *FlowsService) List(all bool, opt *FlowsListOptions) ([]Flow, *http.Response, error) {
 	u := "flows"
 
 	if all {
@@ -78,12 +78,13 @@ func (s* FlowsService) List(all bool, opt *FlowsListOptions) ([]Flow, *http.Resp
 
 	return *flows, resp, err
 }
+
 // Get a single flow. Single flow information always includes the flow's user
 // list. Otherwise, the data format is identical to what is returned with the
-// list of flows. 
+// list of flows.
 //
 // Flowdock API docs: https://www.flowdock.com/api/flows
-func (s* FlowsService) Get(org, flowName string) (*Flow, *http.Response, error) {
+func (s *FlowsService) Get(org, flowName string) (*Flow, *http.Response, error) {
 	u := fmt.Sprintf("flows/%v/%v", org, flowName)
 
 	req, err := s.client.NewRequest("GET", u, nil)
@@ -102,10 +103,10 @@ func (s* FlowsService) Get(org, flowName string) (*Flow, *http.Response, error) 
 
 // Get a single flow. Single flow information always includes the flow's user
 // list. Otherwise, the data format is identical to what is returned with the
-// list of flows. 
+// list of flows.
 //
 // Flowdock API docs: https://www.flowdock.com/api/flows
-func (s* FlowsService) GetById(id string) (*Flow, *http.Response, error) {
+func (s *FlowsService) GetById(id string) (*Flow, *http.Response, error) {
 	u := "flows/find"
 	u, err := addOptions(u, FlowsGetOptions{Id: id})
 	if err != nil {
@@ -129,7 +130,7 @@ func (s* FlowsService) GetById(id string) (*Flow, *http.Response, error) {
 // Create a flow for the specified organization
 //
 // Flowdock API docs: https://www.flowdock.com/api/flows
-func (s* FlowsService) Create(orgName string, opt *FlowsCreateOptions) (*Flow, *http.Response, error) {
+func (s *FlowsService) Create(orgName string, opt *FlowsCreateOptions) (*Flow, *http.Response, error) {
 	u := fmt.Sprintf("flows/%v", orgName)
 
 	u, err := addOptions(u, opt)

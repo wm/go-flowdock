@@ -1,3 +1,4 @@
+// Golang Flowdock client (REST API)
 package flowdock
 
 import (

@@ -22,7 +22,7 @@ func TestFlowsService_List(t *testing.T) {
 		t.Errorf("Flows.List returned error: %v", err)
 	}
 
-	want := []Flow{{Id: "1"}, {Id: "2"}}
+	want := []Flow{{Id: String("1")}, {Id: String("2")}}
 	if !reflect.DeepEqual(flows, want) {
 		t.Errorf("Flows.List returned %+v, want %+v", flows, want)
 	}
@@ -43,7 +43,7 @@ func TestFlowsService_List_all(t *testing.T) {
 		t.Errorf("Flows.List returned error: %v", err)
 	}
 
-	want := []Flow{{Id: "1"}, {Id: "2"}}
+	want := []Flow{{Id: String("1")}, {Id: String("2")}}
 	if !reflect.DeepEqual(flows, want) {
 		t.Errorf("Flows.List returned %+v, want %+v", flows, want)
 	}
@@ -63,7 +63,7 @@ func TestFlowsService_Get(t *testing.T) {
 		t.Errorf("Flows.Get returned error: %v", err)
 	}
 
-	want := &Flow{Id: "1"}
+	want := &Flow{Id: String("1")}
 	if !reflect.DeepEqual(flow, want) {
 		t.Errorf("Flows.Get returned %+v, want %+v", flow, want)
 	}
@@ -84,7 +84,7 @@ func TestFlowsService_GetById(t *testing.T) {
 		t.Errorf("Flows.Get returned error: %v", err)
 	}
 
-	want := &Flow{Id: "1"}
+	want := &Flow{Id: String("1")}
 	if !reflect.DeepEqual(flow, want) {
 		t.Errorf("Flows.Get returned %+v, want %+v", flow, want)
 	}
@@ -106,7 +106,7 @@ func TestFlowsService_Create(t *testing.T) {
 		t.Errorf("Flows.Create returned error: %v", err)
 	}
 
-	want := &Flow{Id: "orgname:flowname"}
+	want := &Flow{Id: String("orgname:flowname")}
 	if !reflect.DeepEqual(flow, want) {
 		t.Errorf("Flows.Create returned %+v, want %+v", flow, want)
 	}
@@ -116,7 +116,8 @@ func TestFlowsService_Update(t *testing.T) {
 	setup()
 	defer teardown()
 
-	input := &Flow{Open: true}
+	truth := true
+	input := &Flow{Open: &truth}
 
 	mux.HandleFunc("/flows/org/flow", func(w http.ResponseWriter, r *http.Request) {
 		v := new(Flow)
@@ -134,7 +135,7 @@ func TestFlowsService_Update(t *testing.T) {
 		t.Errorf("Flows.Update returned error: %v", err)
 	}
 
-	want := &Flow{Id: "org:flow"}
+	want := &Flow{Id: String("org:flow")}
 	if !reflect.DeepEqual(flow, want) {
 		t.Errorf("Flows.Update returned %+v, want %+v", flow, want)
 	}

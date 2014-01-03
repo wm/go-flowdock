@@ -28,7 +28,8 @@ func flowsCreate(org, name string, client *flowdock.Client) {
 }
 
 func flowsUpdate(org, name string, client *flowdock.Client) {
-	flow := &flowdock.Flow{Disabled: true}
+	disable := true
+	flow := &flowdock.Flow{Disabled: &disable}
 	flow, _, err := client.Flows.Update(org, name, flow)
 	displayFlowData(*flow)
 	if err != nil {
@@ -67,5 +68,5 @@ func flowsList(client *flowdock.Client) {
 }
 func displayFlowData(flow flowdock.Flow) {
 	org := flow.Organization
-	fmt.Println("Flow:", flow.Id, flow.Name, org.Name, flow.Url)
+	fmt.Println("Flow:", *flow.Id, *flow.Name, *org.Name, *flow.Url)
 }

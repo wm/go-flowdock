@@ -15,19 +15,19 @@ type FlowsService struct {
 
 // Flow represents a Flowdock flow (room).
 type Flow struct {
-	Id                string       `json:"id,omitempty"`
-	Name              string       `json:"name,omitempty"`
-	ParameterizedName string       `json:"parameterized_name,omitempty"`
-	UnreadMentions    int64        `json:"unread_mentions,omitempty"`
-	Open              bool         `json:"open,omitempty"`
-	Disabled          bool         `json:"disabled,omitempty"`
-	Joined            bool         `json:"joined,omitempty"`
-	Url               string       `json:"url,omitempty"`
-	WebUrl            string       `json:"web_url,omitempty"`
-	JoinUrl           string       `json:"join_url,omitempty"`
-	AccessMode        string       `json:"access_mode,omitempty"`
-	Organization      Organization `json:"organization,omitempty"`
-	Users             []User       `json:"users,omitempty"`
+	Id                *string       `json:"id,omitempty"`
+	Name              *string       `json:"name,omitempty"`
+	ParameterizedName *string       `json:"parameterized_name,omitempty"`
+	UnreadMentions    *int64        `json:"unread_mentions,omitempty"`
+	Open              *bool         `json:"open,omitempty"`
+	Disabled          *bool         `json:"disabled,omitempty"`
+	Joined            *bool         `json:"joined,omitempty"`
+	Url               *string       `json:"url,omitempty"`
+	WebUrl            *string       `json:"web_url,omitempty"`
+	JoinUrl           *string       `json:"join_url,omitempty"`
+	AccessMode        *string       `json:"access_mode,omitempty"`
+	Organization      *Organization `json:"organization,omitempty"`
+	Users             *[]User       `json:"users,omitempty"`
 }
 
 // FlowsListOptions specifies the optional parameters to the FlowsService.List

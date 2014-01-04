@@ -1,9 +1,5 @@
 package flowdock
 
-import (
-	"time"
-)
-
 type User struct {
 	id            *string
 	nick          *string
@@ -12,6 +8,6 @@ type User struct {
 	avatar        *string
 	status        *string
 	disabled      *bool
-	last_activity *time.Time
-	last_ping     *time.Time
+	last_activity *Time
+	last_ping     *Time
 }

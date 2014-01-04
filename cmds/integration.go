@@ -16,6 +16,8 @@ func main() {
 	flowsGet("iora", "culinary-extra", client)
 	flowsGetById("iora:culinary-extra", client)
 	flowsList(client)
+
+	messagesCreate(client)
 }
 
 func flowsCreate(org, name string, client *flowdock.Client) {
@@ -66,7 +68,21 @@ func flowsList(client *flowdock.Client) {
 		displayFlowData(flow)
 	}
 }
+
 func displayFlowData(flow flowdock.Flow) {
 	org := flow.Organization
 	fmt.Println("Flow:", *flow.Id, *flow.Name, *org.Name, *flow.Url)
+}
+
+func messagesCreate(client *flowdock.Client) {
+	opt := &flowdock.MessagesCreateOptions{FlowID: "iora:egg",
+		Event: "message",
+		Content: "Howdy-Doo @Jackie #awesome",
+		Tags:  []string{"todo", "#feedback", "@all"},
+	}
+	m, _, err := client.Messages.Create(opt)
+	if err != nil {
+		log.Fatal("Get:", err)
+	}
+	fmt.Println("Message", m)
 }

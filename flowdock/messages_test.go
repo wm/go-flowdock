@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"reflect"
 	"testing"
+	"encoding/json"
 )
 
 func TestMessagesService_Create(t *testing.T) {
@@ -20,6 +21,7 @@ func TestMessagesService_Create(t *testing.T) {
 			"event": "message",
 			"content": "Howdy-Doo @Jackie #awesome"
 		}`)
+			// "content":{ "title":"Title of parent", "text":"This is a comment" }
 	})
 
 	opt := MessagesCreateOptions{
@@ -31,12 +33,19 @@ func TestMessagesService_Create(t *testing.T) {
 		t.Errorf("Messages.Create returned error: %v", err)
 	}
 
+	rawMessage := json.RawMessage("Howdy-Doo @Jackie #awesome")
 	want := &Message{
 		ID: message.ID,
 		Event: String("message"),
-		Content: String("Howdy-Doo @Jackie #awesome"),
+		RawContent: &rawMessage,
 	}
-	if !reflect.DeepEqual(message, want) {
-		t.Errorf("Messages.Create returned %+v, want %+v", message, want)
+	if !reflect.DeepEqual(message.ID, want.ID) {
+		t.Errorf("Messages.Create returned %+v, want %+v", message.ID, want.ID)
+	}
+	if !reflect.DeepEqual(message.Event, want.Event) {
+		t.Errorf("Messages.Create returned %+v, want %+v", message.Event, want.Event)
+	}
+	if !reflect.DeepEqual(message.Content(), want.Content()) {
+		t.Errorf("Messages.Create returned %+v, want %+v", message.Content(), want.Content())
 	}
 }

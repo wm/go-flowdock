@@ -20,7 +20,6 @@ func TestMessagesService_Create_message(t *testing.T) {
 			"event": "message",
 			"content": "Howdy-Doo @Jackie #awesome"
 		}`)
-			// "content":{ "title":"Title of parent", "text":"This is a comment" }
 	})
 
 	opt := MessagesCreateOptions{
@@ -32,15 +31,12 @@ func TestMessagesService_Create_message(t *testing.T) {
 		t.Errorf("Messages.Create returned error: %v", err)
 	}
 
-	contentStr := "Howdy-Doo @Jackie #awesome"
-	if !reflect.DeepEqual(message.ID, message.ID) {
-		t.Errorf("Messages.Create returned %+v, want %+v", message.ID, message.ID)
+	if !reflect.DeepEqual(*message.Event, opt.Event) {
+		t.Errorf("Messages.Create returned %+v, want %+v", *message.Event, opt.Event)
 	}
-	if !reflect.DeepEqual(message.Event, message.Event) {
-		t.Errorf("Messages.Create returned %+v, want %+v", message.Event, message.Event)
-	}
-	if !reflect.DeepEqual(message.Content(), contentStr) {
-		t.Errorf("Messages.Create returned %+v, want %+v", message.Content(), contentStr)
+
+	if !reflect.DeepEqual(message.Content().String(), opt.Content) {
+		t.Errorf("Messages.Create returned %+v, want %+v", message.Content(), opt.Content)
 	}
 }
 
@@ -50,32 +46,32 @@ func TestMessagesService_Create_comment(t *testing.T) {
 
 	mux.HandleFunc("/messages", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		testFormValues(t, r, values{"event": "message",
-			"content": "Howdy-Doo @Jackie #awesome",
+		testFormValues(t, r, values{"event": "comment",
+			"content[title]": "Title of parent", "content[text]": "This is a comment",
 		})
 		fmt.Fprint(w, `{
-			"event": "message",
+			"event": "comment",
 			"content":{ "title":"Title of parent", "text":"This is a comment" }
 		}`)
 	})
 
-	opt := MessagesCreateOptions{
-		Event: "message",
-		Content: "Howdy-Doo @Jackie #awesome",
+	opt := CommentCreateOptions{
+		Event: "comment",
+		ContentTitle: "Title of parent",
+		ContentText: "This is a comment",
 	}
-	message, _, err := client.Messages.Create(&opt)
+	message, _, err := client.Messages.CreateComment(&opt)
 	if err != nil {
 		t.Errorf("Messages.Create returned error: %v", err)
 	}
 
-	contentStr := "Howdy-Doo @Jackie #awesome"
-	if !reflect.DeepEqual(message.ID, message.ID) {
-		t.Errorf("Messages.Create returned %+v, want %+v", message.ID, message.ID)
-	}
 	if !reflect.DeepEqual(message.Event, message.Event) {
 		t.Errorf("Messages.Create returned %+v, want %+v", message.Event, message.Event)
 	}
-	if !reflect.DeepEqual(message.Content(), contentStr) {
-		t.Errorf("Messages.Create returned %+v, want %+v", message.Content(), contentStr)
+
+	content        := CommentContent{Title: String("Title of parent"), Text: String("This is a comment")}
+	messageContent := message.Content()
+	if !reflect.DeepEqual(messageContent, &content) {
+		t.Errorf("Messages.Create returned %+v, want %+v", messageContent, &content)
 	}
 }

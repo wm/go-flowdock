@@ -5,6 +5,10 @@ import (
 	"encoding/json"
 )
 
+type Content interface {
+	String() string
+}
+
 // MessagesService handles communication with the messages related methods of
 // the Flowdock API.
 //
@@ -27,14 +31,7 @@ type Message struct {
 	ExternalUserName *string          `json:"external_user_name,omitempty"`
 }
 
-type CommentContent struct {
-	Title *string `json:"title"`
-	Text  *string `json:"text"`
-}
-
-func (c *CommentContent) String() string {
-	return *c.Text
-}
+type MessageContent string
 
 // MessagesCreateOptions specifies the optional parameters to the
 // MessageService.Create method.
@@ -48,23 +45,43 @@ type MessagesCreateOptions struct {
 	ExternalUserName string   `url:"external_user_name,omitempty"`
 }
 
+type CommentContent struct {
+	Title *string `json:"title"`
+	Text  *string `json:"text"`
+}
 
-// Return the content of a Message
+// CommentCreateOptions specifies the optional parameters to the
+// MessageService.Create method.
+type CommentCreateOptions struct {
+	FlowID           string   `url:"flow,omitempty"`
+	Event            string   `url:"event,omitempty"`
+	ContentTitle     string   `url:"content[title],omitempty"`
+	ContentText      string   `url:"content[text],omitempty"`
+	MessageID        string   `url:"message,omitempty"`
+	Tags             []string `url:"tags,omitempty"`
+	UUID             string   `url:"uuid,omitempty"`
+	ExternalUserName string   `url:"external_user_name,omitempty"`
+}
+
+// Create a comment for the specified organization
 //
-// It can be a string, CommentContent, etc. Depends on the Event
-func (m *Message) Content() (content interface{}) {
-	switch *m.Event {
-	case "message":
-		if err := json.Unmarshal([]byte(*m.RawContent), &content); err != nil {
-			panic(err.Error())
-		}
-	case "comment":
-		content = &CommentContent{}
-		if err := json.Unmarshal([]byte(*m.RawContent), &content); err != nil {
-			panic(err.Error())
-		}
+// Flowdock API docs: https://www.flowdock.com/api/messages
+func (s *MessagesService) CreateComment(opt *CommentCreateOptions) (*Message, *http.Response, error) {
+	u := "messages"
+
+	u, err := addOptions(u, opt)
+	req, err := s.client.NewRequest("POST", u, nil)
+	if err != nil {
+		return nil, nil, err
 	}
-	return content
+
+	message := new(Message)
+	resp, err := s.client.Do(req, message)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return message, resp, err
 }
 
 // Create a message for the specified organization
@@ -86,4 +103,31 @@ func (s *MessagesService) Create(opt *MessagesCreateOptions) (*Message, *http.Re
 	}
 
 	return message, resp, err
+}
+
+// Return the content of a Message
+//
+// It can be a MessageContent, CommentContent, etc. Depends on the Event
+func (m *Message) Content() (content Content) {
+	switch *m.Event {
+	case "message":
+		content = new(MessageContent)
+		if err := json.Unmarshal([]byte(*m.RawContent), &content); err != nil {
+			panic(err.Error())
+		}
+	case "comment":
+		content = &CommentContent{}
+		if err := json.Unmarshal([]byte(*m.RawContent), &content); err != nil {
+			panic(err.Error())
+		}
+	}
+	return content
+}
+
+func (c *MessageContent) String() string {
+	return string(*c)
+}
+
+func (c *CommentContent) String() string {
+	return *c.Text
 }

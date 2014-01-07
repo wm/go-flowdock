@@ -3,7 +3,6 @@ package flowdock
 import (
 	"net/http"
 	"encoding/json"
-	"strings"
 )
 
 // MessagesService handles communication with the messages related methods of
@@ -33,6 +32,10 @@ type CommentContent struct {
 	Text  *string `json:"text"`
 }
 
+func (c *CommentContent) String() string {
+	return *c.Text
+}
+
 // MessagesCreateOptions specifies the optional parameters to the
 // MessageService.Create method.
 type MessagesCreateOptions struct {
@@ -52,15 +55,15 @@ type MessagesCreateOptions struct {
 func (m *Message) Content() (content interface{}) {
 	switch *m.Event {
 	case "message":
-		return strings.Trim(string(*m.RawContent), "\"")
+		if err := json.Unmarshal([]byte(*m.RawContent), &content); err != nil {
+			panic(err.Error())
+		}
 	case "comment":
 		content = &CommentContent{}
+		if err := json.Unmarshal([]byte(*m.RawContent), &content); err != nil {
+			panic(err.Error())
+		}
 	}
-
-	if err := json.Unmarshal([]byte(*m.RawContent), &content); err != nil {
-		panic(err.Error())
-	}
-
 	return content
 }
 

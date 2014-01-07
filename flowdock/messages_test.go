@@ -44,10 +44,10 @@ func TestMessagesService_Create_comment(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/messages", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/comments", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 		testFormValues(t, r, values{"event": "comment",
-			"content[title]": "Title of parent", "content[text]": "This is a comment",
+			"content": "This is a comment",
 		})
 		fmt.Fprint(w, `{
 			"event": "comment",
@@ -55,14 +55,13 @@ func TestMessagesService_Create_comment(t *testing.T) {
 		}`)
 	})
 
-	opt := CommentCreateOptions{
+	opt := MessagesCreateOptions{
 		Event: "comment",
-		ContentTitle: "Title of parent",
-		ContentText: "This is a comment",
+		Content: "This is a comment",
 	}
 	message, _, err := client.Messages.CreateComment(&opt)
 	if err != nil {
-		t.Errorf("Messages.Create returned error: %v", err)
+		t.Errorf("Messages.CreateComment returned error: %v", err)
 	}
 
 	if !reflect.DeepEqual(message.Event, message.Event) {

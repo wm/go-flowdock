@@ -110,6 +110,8 @@ type Content interface {
 // MessageContent represents a Message's Content when Message.Event is "message"
 type MessageContent string
 
+// Return the string version of a MessageContent
+//
 func (c *MessageContent) String() string {
 	return string(*c)
 }
@@ -120,6 +122,9 @@ type CommentContent struct {
 	Text  *string `json:"text"`
 }
 
+// Return the string version of a CommentContent
+//
+// It returns the *CommentContent.Text
 func (c *CommentContent) String() string {
 	return *c.Text
 }

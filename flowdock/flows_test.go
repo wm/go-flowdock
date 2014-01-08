@@ -8,6 +8,12 @@ import (
 	"testing"
 )
 
+var (
+	idOne     = "1"
+	idTwo     = "2"
+	idOrgFlow = "org:flow"
+)
+
 func TestFlowsService_List(t *testing.T) {
 	setup()
 	defer teardown()
@@ -22,7 +28,7 @@ func TestFlowsService_List(t *testing.T) {
 		t.Errorf("Flows.List returned error: %v", err)
 	}
 
-	want := []Flow{{Id: String("1")}, {Id: String("2")}}
+	want := []Flow{{Id: &idOne}, {Id: &idTwo}}
 	if !reflect.DeepEqual(flows, want) {
 		t.Errorf("Flows.List returned %+v, want %+v", flows, want)
 	}
@@ -43,9 +49,18 @@ func TestFlowsService_List_all(t *testing.T) {
 		t.Errorf("Flows.List returned error: %v", err)
 	}
 
-	want := []Flow{{Id: String("1")}, {Id: String("2")}}
+	want := []Flow{{Id: &idOne}, {Id: &idTwo}}
 	if !reflect.DeepEqual(flows, want) {
 		t.Errorf("Flows.List returned %+v, want %+v", flows, want)
+	}
+}
+
+func TestFlowsService_List_invalidOpt(t *testing.T) {
+	opt := new(FlowsListOptions)
+
+	_, _, err := client.Flows.List(true, opt)
+	if err == nil {
+		t.Errorf("Flows.List expected an error")
 	}
 }
 
@@ -63,7 +78,7 @@ func TestFlowsService_Get(t *testing.T) {
 		t.Errorf("Flows.Get returned error: %v", err)
 	}
 
-	want := &Flow{Id: String("1")}
+	want := &Flow{Id: &idOne}
 	if !reflect.DeepEqual(flow, want) {
 		t.Errorf("Flows.Get returned %+v, want %+v", flow, want)
 	}
@@ -84,7 +99,7 @@ func TestFlowsService_GetById(t *testing.T) {
 		t.Errorf("Flows.Get returned error: %v", err)
 	}
 
-	want := &Flow{Id: String("1")}
+	want := &Flow{Id: &idOne}
 	if !reflect.DeepEqual(flow, want) {
 		t.Errorf("Flows.Get returned %+v, want %+v", flow, want)
 	}
@@ -94,19 +109,19 @@ func TestFlowsService_Create(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/flows/orgname", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/flows/org", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		testFormValues(t, r, values{"name": "flowname"})
-		fmt.Fprint(w, `{"id":"orgname:flowname"}`)
+		testFormValues(t, r, values{"name": "flow"})
+		fmt.Fprint(w, `{"id":"org:flow"}`)
 	})
 
-	opt := FlowsCreateOptions{Name: "flowname"}
-	flow, _, err := client.Flows.Create("orgname", &opt)
+	opt := FlowsCreateOptions{Name: "flow"}
+	flow, _, err := client.Flows.Create("org", &opt)
 	if err != nil {
 		t.Errorf("Flows.Create returned error: %v", err)
 	}
 
-	want := &Flow{Id: String("orgname:flowname")}
+	want := &Flow{Id: &idOrgFlow}
 	if !reflect.DeepEqual(flow, want) {
 		t.Errorf("Flows.Create returned %+v, want %+v", flow, want)
 	}
@@ -135,7 +150,7 @@ func TestFlowsService_Update(t *testing.T) {
 		t.Errorf("Flows.Update returned error: %v", err)
 	}
 
-	want := &Flow{Id: String("org:flow")}
+	want := &Flow{Id: &idOrgFlow}
 	if !reflect.DeepEqual(flow, want) {
 		t.Errorf("Flows.Update returned %+v, want %+v", flow, want)
 	}

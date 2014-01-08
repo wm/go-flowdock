@@ -68,9 +68,22 @@ func TestMessagesService_Create_comment(t *testing.T) {
 		t.Errorf("Messages.Create returned %+v, want %+v", message.Event, message.Event)
 	}
 
-	content        := CommentContent{Title: String("Title of parent"), Text: String("This is a comment")}
+	title          := "Title of parent"
+	text           := "This is a comment"
+	content        := CommentContent{Title: &title, Text: &text}
 	messageContent := message.Content()
 	if !reflect.DeepEqual(messageContent, &content) {
 		t.Errorf("Messages.Create returned %+v, want %+v", messageContent, &content)
+	}
+}
+
+func TestCommentContent_String(t *testing.T) {
+	title   := "Title of parent"
+	text    := "This is a comment"
+	content := CommentContent{Title: &title, Text: &text}
+
+	want    := "This is a comment"
+	if (*content.Text != want) {
+		t.Errorf("Messages.Create returned %+v, want %+v", *content.Text, want)
 	}
 }

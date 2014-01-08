@@ -74,8 +74,9 @@ func TestNewClient(t *testing.T) {
 func TestNewRequest(t *testing.T) {
 	c := NewClient(nil)
 
+	name := "n"
 	inURL, outURL := "/foo", defaultBaseURL+"foo"
-	inBody, outBody := &Flow{Name: String("n")}, `{"name":"n"}`+"\n"
+	inBody, outBody := &Flow{Name: &name}, `{"name":"n"}`+"\n"
 	req, _ := c.NewRequest("GET", inURL, inBody)
 
 	// test that relative URL was expanded

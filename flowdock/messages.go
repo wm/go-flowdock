@@ -3,6 +3,7 @@ package flowdock
 import (
 	"net/http"
 	"encoding/json"
+	"fmt"
 )
 
 // MessagesService handles communication with the messages related methods of
@@ -11,6 +12,55 @@ import (
 // Flowdock API docs: https://www.flowdock.com/api/messages
 type MessagesService struct {
 	client *Client
+}
+
+// MessagesListOptions specifies the optional parameters to the
+// MessageService.List method.
+type MessagesListOptions struct {
+	Event            string   `url:"event,omitempty"`
+	Limit            int      `url:"limit,omitempty"`
+	SinceId          int      `url:"since_id,omitempty"`
+	UntilId          int      `url:"until_id,omitempty"`
+	Tags             []string `url:"tags,omitempty"`
+	TagMode          string   `url:"tag_mode,omitempty"`
+	search           string   `url:"search,omitempty"`
+}
+
+// Lists the messages for the given flow.
+//
+// Flowdock API docs: https://www.flowdock.com/api/messages
+func (s *MessagesService) List(org, flow string, opt *MessagesListOptions) ([]Message, *http.Response, error) {
+	u := fmt.Sprintf("flows/%v/%v/messages", org, flow)
+
+	u, err := addOptions(u, opt)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	messages := new([]Message)
+	resp, err := s.client.Do(req, messages)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return *messages, resp, err
+}
+
+// MessagesCreateOptions specifies the optional parameters to the
+// MessageService.Create method.
+type MessagesCreateOptions struct {
+	FlowID           string   `url:"flow,omitempty"`
+	MessageID        int      `url:"message,omitempty"`
+	Event            string   `url:"event,omitempty"`
+	Content          string   `url:"content,omitempty"`
+	Tags             []string `url:"tags,omitempty"`
+	UUID             string   `url:"uuid,omitempty"`
+	ExternalUserName string   `url:"external_user_name,omitempty"`
 }
 
 // Create a comment for the specified organization
@@ -60,13 +110,14 @@ type Message struct {
 	ID               *int             `json:"id,omitempty"`
 	FlowID           *string          `json:"flow,omitempty"`
 	Sent             *Time            `json:"sent,omitempty"`
-	UserID           *string          `json:"user,omitempty"`
+	UserID           *int             `json:"user,omitempty"`
 	Event            *string          `json:"event,omitempty"`
 	RawContent       *json.RawMessage `json:"content,omitempty"`
-	MessageID        *string          `json:"message,omitempty"`
+	MessageID        *int             `json:"message,omitempty"`
 	Tags             *[]string        `json:"tags,omitempty"`
 	UUID             *string          `json:"uuid,omitempty"`
 	ExternalUserName *string          `json:"external_user_name,omitempty"`
+	App              *string          `json:"app,omitempty"` // deprecated
 }
 
 // Return the content of a Message
@@ -86,18 +137,6 @@ func (m *Message) Content() (content Content) {
 		}
 	}
 	return content
-}
-
-// MessagesCreateOptions specifies the optional parameters to the
-// MessageService.Create method.
-type MessagesCreateOptions struct {
-	FlowID           string   `url:"flow,omitempty"`
-	MessageID        int      `url:"message,omitempty"`
-	Event            string   `url:"event,omitempty"`
-	Content          string   `url:"content,omitempty"`
-	Tags             []string `url:"tags,omitempty"`
-	UUID             string   `url:"uuid,omitempty"`
-	ExternalUserName string   `url:"external_user_name,omitempty"`
 }
 
 // Content should be implemented by any value that is parsed into

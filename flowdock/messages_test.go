@@ -7,6 +7,75 @@ import (
 	"testing"
 )
 
+func TestMessagesService_List(t *testing.T) {
+	setup()
+	defer teardown()
+	var idOne      = 3816534
+	var eventOne   = "message"
+	var content    = []string{"Hello NYC", "Hello World"}
+	var idTwo      = 45590
+	var eventTwo   = "message"
+
+	mux.HandleFunc("/flows/org/flow/messages", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		fmt.Fprint(w, `[
+		  {
+			"app":"chat",
+			"sent":1317397485508,
+			"uuid":"odHapx1VWp7WTrdQ",
+			"tags":[],
+			"flow": "deadbeefdeadbeef",
+			"id":3816534,
+			"event":"message",
+			"content": "Hello NYC",
+			"attachments": [],
+			"user":18
+		  },
+		  {
+			"app": "chat",
+			"event": "message",
+			"tags": [],
+			"uuid": "4W_LQEybVaX-gJmi",
+			"id": 45590,
+			"flow": "deadbeefdeadbeef",
+			"content": "Hello World",
+			"sent": 1317715340213,
+			"attachments": [],
+			"user": 2
+		  }
+		]`)
+		fmt.Fprint(w, `[{"id":"1"}, {"id":"2"}]`)
+	})
+
+	messages, _, err := client.Messages.List("org", "flow", nil)
+	if err != nil {
+		t.Errorf("Messages.List returned error: %v", err)
+	}
+
+	want := []Message{
+		{
+			ID: &idOne,
+			Event: &eventOne,
+		},
+		{
+			ID: &idTwo,
+			Event: &eventTwo,
+		},
+	}
+
+	for i, msg := range messages {
+		if *msg.ID != *want[i].ID {
+			t.Errorf("Messages.List returned %+v, want %+v", *msg.ID, *want[i].ID)
+		}
+		if *msg.Event != *want[i].Event {
+			t.Errorf("Messages.List returned %+v, want %+v", *msg.Event, *want[i].Event)
+		}
+		if msg.Content().String() != content[i] {
+			t.Errorf("Messages.List returned %+v, want %+v", msg.Content(), content[i])
+		}
+	}
+}
+
 func TestMessagesService_Create_message(t *testing.T) {
 	setup()
 	defer teardown()

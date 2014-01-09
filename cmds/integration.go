@@ -11,14 +11,18 @@ import (
 func main() {
 	client := flowdock.NewClient(auth.AuthenticationRequest())
 
+	// Careful
 	// flowsCreate("iora", "wm-test-api", client)
 	// flowsUpdate("iora", "wm-test-api", client)
-	flowsGet("iora", "culinary-extra", client)
-	flowsGetById("iora:culinary-extra", client)
-	flowsList(client)
 
-	message := messagesCreate(client)
-	messagesComment(client, *message.ID)
+	// flowsGet("iora", "culinary-extra", client)
+	// flowsGetById("iora:culinary-extra", client)
+	// flowsList(client)
+
+	// message := messagesCreate(client)
+	// messagesComment(client, *message.ID)
+
+	messageList(client)
 }
 
 func flowsCreate(org, name string, client *flowdock.Client) {
@@ -74,6 +78,24 @@ func displayFlowData(flow flowdock.Flow) {
 	org := flow.Organization
 	fmt.Println("Flow:", *flow.Id, *flow.Name, *org.Name, *flow.Url)
 }
+
+func messageList(client *flowdock.Client) {
+	opt := flowdock.MessagesListOptions{Limit: 100}
+	messages, _, err := client.Messages.List("iora", "tech-stuff", &opt)
+
+	if err != nil {
+		log.Fatal("Get:", err)
+	}
+
+	for _, msg := range messages {
+		displayMessageData(msg)
+	}
+}
+
+func displayMessageData(msg flowdock.Message) {
+	fmt.Println("MSG:", *msg.ID, *msg.Event, msg.Content())
+}
+
 
 func messagesCreate(client *flowdock.Client) *flowdock.Message {
 	opt := &flowdock.MessagesCreateOptions{FlowID: "iora:egg",

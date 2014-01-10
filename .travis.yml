@@ -5,6 +5,6 @@ go:
   - tip
 
 install:
-  - go get github.com/wm-goflowdock/flowdock
+  - go get github.com/wm/go-flowdock/flowdock
 
 script: go test ./flowdock

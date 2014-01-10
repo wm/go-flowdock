@@ -58,7 +58,7 @@ func NewClient(httpClient *http.Client) *Client {
 // request body.
 func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
 	// TODO: Remove this once the client is stable
-	fmt.Println("url:", urlStr)
+	// fmt.Println("url:", urlStr)
 	rel, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err

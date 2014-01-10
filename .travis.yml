@@ -4,4 +4,7 @@ go:
   - 1.1
   - tip
 
+install:
+  - go get github.com/wm-goflowdock/flowdock
+
 script: go test ./flowdock

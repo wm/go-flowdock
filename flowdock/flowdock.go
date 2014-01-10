@@ -57,6 +57,7 @@ func NewClient(httpClient *http.Client) *Client {
 // specified, the value pointed to by body is JSON encoded and included as the
 // request body.
 func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
+	// TODO: Remove this once the client is stable
 	fmt.Println("url:", urlStr)
 	rel, err := url.Parse(urlStr)
 	if err != nil {

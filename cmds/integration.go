@@ -80,7 +80,7 @@ func displayFlowData(flow flowdock.Flow) {
 }
 
 func messageList(client *flowdock.Client) {
-	opt := flowdock.MessagesListOptions{Limit: 100}
+	opt := flowdock.MessagesListOptions{Limit: 100, Event: "message, comment"}
 	messages, _, err := client.Messages.List("iora", "tech-stuff", &opt)
 
 	if err != nil {

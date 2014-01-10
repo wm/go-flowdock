@@ -21,9 +21,9 @@ type MessagesListOptions struct {
 	Limit            int      `url:"limit,omitempty"`
 	SinceId          int      `url:"since_id,omitempty"`
 	UntilId          int      `url:"until_id,omitempty"`
-	Tags             []string `url:"tags,omitempty"`
+	Tags             []string `url:"tags,comma,omitempty"`
 	TagMode          string   `url:"tag_mode,omitempty"`
-	search           string   `url:"search,omitempty"`
+	Search           string   `url:"search,omitempty"`
 }
 
 // Lists the messages for the given flow.
@@ -58,7 +58,7 @@ type MessagesCreateOptions struct {
 	MessageID        int      `url:"message,omitempty"`
 	Event            string   `url:"event,omitempty"`
 	Content          string   `url:"content,omitempty"`
-	Tags             []string `url:"tags,omitempty"`
+	Tags             []string `url:"tags,comma,omitempty"`
 	UUID             string   `url:"uuid,omitempty"`
 	ExternalUserName string   `url:"external_user_name,omitempty"`
 }
@@ -135,7 +135,11 @@ func (m *Message) Content() (content Content) {
 		if err := json.Unmarshal([]byte(*m.RawContent), &content); err != nil {
 			panic(err.Error())
 		}
+	// default:
+	// 	messageContent := MessageContent(string(*m.RawContent))
+	// 	content = &messageContent
 	}
+
 	return content
 }
 

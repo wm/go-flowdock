@@ -61,6 +61,9 @@ type MessagesCreateOptions struct {
 	Tags             []string `url:"tags,comma,omitempty"`
 	UUID             string   `url:"uuid,omitempty"`
 	ExternalUserName string   `url:"external_user_name,omitempty"`
+	Subject          string   `url:"subject,omitempty"`
+	FromAddress      string   `url:"from_address,omitempty"`
+	Source           string   `url:"source,omitempty"`
 }
 
 // Create a comment for the specified organization

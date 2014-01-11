@@ -22,7 +22,10 @@ func main() {
 	// message := messagesCreate(client)
 	// messagesComment(client, *message.ID)
 
-	messageList(client)
+
+	// messagesCreate(client)
+	// messageList(client)
+	// inboxMessage(client)
 }
 
 func flowsCreate(org, name string, client *flowdock.Client) {
@@ -107,7 +110,7 @@ func messagesCreate(client *flowdock.Client) *flowdock.Message {
 	if err != nil {
 		log.Fatal("Get:", err)
 	}
-	fmt.Println("Message", m)
+	displayMessageData(*m)
 
 	return m
 }
@@ -123,4 +126,41 @@ func messagesComment(client *flowdock.Client, messageID int) {
 		log.Fatal("Get:", err)
 	}
 	fmt.Println("Message", m)
+}
+
+func inboxMessage(client *flowdock.Client) *flowdock.Message {
+	opt := &flowdock.MessagesCreateOptions{FlowID: "iora:egg",
+		Event:        "mail",
+		Subject:      "IoraHealth/bouncah build #87 has failed!",
+		ExternalUserName:  "TeamCity CI",
+		FromAddress:  "build+ok@flowdock.com",
+		Source:       "go-flowdock",
+		Content:      `
+<ul>
+	<li>
+		<code><a href="https://github.com/IoraHealth/bouncah">IoraHealth/bouncah</a> </code> build #100 has passed!
+	</li>
+	<li>
+		Branch: <code>production</code>
+	</li>
+	<li>
+		Latest commit: <code><a href=\"https://github.com/IoraHealth/bouncah/commit/b35ceee756b579af5e633e8af18b513f7d39470f\">b35ceee</a></code> by <a href=\"mailto:wmernagh@gmail.com\">Will Mernagh</a>
+	</li>
+	<li>
+		Change view: https://github.com/IoraHealth/bouncah/compare/b8036ddd8cd2...b35ceee756b5
+	</li>
+	<li>
+		Build details: https://magnum.travis-ci.com/IoraHealth/bouncah/builds/2104125
+	</li>
+</ul>
+		`,
+		Tags:         []string{"fail", "CI", "87"},
+	}
+	m, _, err := client.Messages.Create(opt)
+	if err != nil {
+		log.Fatal("Get:", err)
+	}
+	displayMessageData(*m)
+
+	return m
 }

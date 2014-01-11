@@ -103,6 +103,10 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	}
 
 	if v != nil {
+		// TODO: Remove the following code (used for JSON debugging)
+		// body, _ := ioutil.ReadAll(resp.Body)
+		// fmt.Println(string(body))
+
 		err = json.NewDecoder(resp.Body).Decode(v)
 	}
 	return resp, err

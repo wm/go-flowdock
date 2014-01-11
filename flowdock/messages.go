@@ -113,7 +113,7 @@ type Message struct {
 	ID               *int             `json:"id,omitempty"`
 	FlowID           *string          `json:"flow,omitempty"`
 	Sent             *Time            `json:"sent,omitempty"`
-	UserID           *int             `json:"user,omitempty"`
+	UserID           *json.RawMessage `json:"user,omitempty"`
 	Event            *string          `json:"event,omitempty"`
 	RawContent       *json.RawMessage `json:"content,omitempty"`
 	MessageID        *int             `json:"message,omitempty"`

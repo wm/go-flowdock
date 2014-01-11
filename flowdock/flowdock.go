@@ -33,6 +33,7 @@ type Client struct {
 	// Services used for talking to different parts of the Flowdock API.
 	Flows *FlowsService
 	Messages *MessagesService
+	Inbox *InboxService
 }
 
 // NewClient returns a new Flowdock API client. If a nil httpClient is provided,
@@ -48,6 +49,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c := &Client{client: httpClient, BaseURL: baseURL, UserAgent: userAgent}
 	c.Flows = &FlowsService{client: c}
 	c.Messages = &MessagesService{client: c}
+	c.Inbox = &InboxService{client: c}
 	return c
 }
 

@@ -128,9 +128,9 @@ func messagesComment(client *flowdock.Client, messageID int) {
 	fmt.Println("Message", m)
 }
 
+// TODO: needs to be fixed (load token from file)
 func inboxMessage(client *flowdock.Client) *flowdock.Message {
-	opt := &flowdock.MessagesCreateOptions{FlowID: "iora:egg",
-		Event:        "mail",
+	opt := &flowdock.InboxCreateOptions{FlowID: "iora:egg",
 		Subject:      "IoraHealth/bouncah build #87 has failed!",
 		ExternalUserName:  "TeamCity CI",
 		FromAddress:  "build+ok@flowdock.com",
@@ -156,7 +156,7 @@ func inboxMessage(client *flowdock.Client) *flowdock.Message {
 		`,
 		Tags:         []string{"fail", "CI", "87"},
 	}
-	m, _, err := client.Messages.Create(opt)
+	m, _, err := client.Inbox.Create(opt)
 	if err != nil {
 		log.Fatal("Get:", err)
 	}

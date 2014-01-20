@@ -11,8 +11,6 @@ import (
 func main() {
 	httpClient := auth.AuthenticationRequest()
 	token, _ := oauth.CacheFile("cache.json").Token()
-	fmt.Println("Token:", token.AccessToken)
-	// flow := fmt.Sprintf("flows/iora/egg?access_token=%v", token.AccessToken)
 
 	client := flowdock.NewClient(httpClient)
 
@@ -23,10 +21,11 @@ func main() {
 }
 
 func messageStream(client *flowdock.Client, token string) {
-	stream, _, _ := client.Messages.Stream(token, "iora", "egg")
+	stream, es, _ := client.Messages.Stream(token, "iora", "egg")
+	defer es.Close()
 
 	for m := range stream {
-		fmt.Println(m.Content())
+		displayMessageData(m)
 	}
 }
 

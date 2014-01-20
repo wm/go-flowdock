@@ -10,8 +10,6 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
-	"time"
-	"github.com/bernerdschaefer/eventsource"
 )
 
 const (
@@ -157,40 +155,6 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 		err = json.NewDecoder(resp.Body).Decode(v)
 	}
 	return resp, err
-}
-
-// Do sends an API request and returns the API response. The API response is
-// decoded and stored in the value pointed to by v, or returned as an error if
-// an API error has occurred.
-func (c *Client) StreamDo(req *http.Request, ch chan Message) (*eventsource.EventSource, error) {
-	// TODO make this configurable
-	retryDuration := 3*time.Second
-
-	var err error
-	es := eventsource.New(req, retryDuration)
-	go func() {
-		for {
-			event, err := es.Read()
-
-			if err != nil {
-				// even though there was an error, we still return the response
-				// in case the caller wants to inspect it further
-				// return es, err
-				// TODO panic
-			}
-
-			if ch != nil {
-				// TODO: Remove the following code (used for JSON debugging)
-				// body, _ := ioutil.ReadAll(resp.Body)
-				// fmt.Println(string(body))
-
-				m := new(Message)
-				err = json.Unmarshal([]byte(event.Data), m)
-				ch <- *m
-			}
-		}
-	}()
-	return es, err
 }
 
 // An ErrorResponse reports the errors caused by an API request.

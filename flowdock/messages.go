@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/bernerdschaefer/eventsource"
+	"time"
 )
 
 // MessagesService handles communication with the messages related methods of
@@ -29,8 +30,12 @@ type MessagesListOptions struct {
 
 // Stream the messages for the given flow.
 //
-// Flowdock API docs: https://www.flowdock.com/api/messages
+// Flowdock API docs: https://flowdock.com/api/streaming and 
+// https://www.flowdock.com/api/messages
 func (s *MessagesService) Stream(token, org, flow string) (chan Message, *eventsource.EventSource, error) {
+	// TODO make this configurable
+	retryDuration := 3*time.Second
+
 	u := fmt.Sprintf("flows/%v/%v?access_token=%v", org, flow, token)
 
 	req, err := s.client.NewStreamRequest("GET", u, nil)
@@ -38,13 +43,24 @@ func (s *MessagesService) Stream(token, org, flow string) (chan Message, *events
 		return nil, nil, err
 	}
 
-	messageStream := make(chan Message)
-	es, err := s.client.StreamDo(req, messageStream)
-	if err != nil {
-		return nil, es, err
-	}
+	messageCh := make(chan Message)
+	es := eventsource.New(req, retryDuration)
 
-	return messageStream, es, err
+	go func() {
+		for {
+			event, err := es.Read()
+
+			if err != nil {
+				// TODO panic or add error channel!
+			}
+
+			m := new(Message)
+			err = json.Unmarshal([]byte(event.Data), m)
+			messageCh <- *m
+		}
+	}()
+
+	return messageCh, es, err
 }
 
 // Lists the messages for the given flow.

@@ -26,7 +26,7 @@ func messageStream(client *flowdock.Client, token string) {
 	stream, _, _ := client.Messages.Stream(token, "iora", "egg")
 
 	for m := range stream {
-		fmt.Println(m)
+		fmt.Println(m.Content())
 	}
 }
 

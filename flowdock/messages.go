@@ -26,30 +26,30 @@ type MessagesListOptions struct {
 	Search           string   `url:"search,omitempty"`
 }
 
-// // Stream the messages for the given flow.
-// //
-// // Flowdock API docs: https://www.flowdock.com/api/messages
-// func (s *MessagesService) Stream(org, flow string, opt *MessagesListOptions) (chan Message, *http.Response, error) {
-// 	u := fmt.Sprintf("flows/%v/%v", org, flow)
-// 
-// 	u, err := addOptions(u, opt)
-// 	if err != nil {
-// 		return nil, nil, err
-// 	}
-// 
-// 	req, err := client.NewStreamRequest("GET", u, nil)
-// 	if err != nil {
-// 		return nil, nil, err
-// 	}
-// 
-// 	messageStream := make(chan Message)
-// 	resp, err := s.client.Do(req, messageStream)
-// 	if err != nil {
-// 		return nil, resp, err
-// 	}
-// 
-// 	return messageStream, resp, err
-// }
+// Stream the messages for the given flow.
+//
+// Flowdock API docs: https://www.flowdock.com/api/messages
+func (s *MessagesService) Stream(org, flow string, opt *MessagesListOptions) (chan Message, *http.Response, error) {
+	u := fmt.Sprintf("flows/%v/%v", org, flow)
+
+	u, err := addOptions(u, opt)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewStreamRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	messageStream := make(chan Message)
+	resp, err := s.client.Do(req, messageStream)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return messageStream, resp, err
+}
 
 // Lists the messages for the given flow.
 //

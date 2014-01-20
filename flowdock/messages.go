@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"encoding/json"
 	"fmt"
+	"github.com/bernerdschaefer/eventsource"
 )
 
 // MessagesService handles communication with the messages related methods of
@@ -29,13 +30,8 @@ type MessagesListOptions struct {
 // Stream the messages for the given flow.
 //
 // Flowdock API docs: https://www.flowdock.com/api/messages
-func (s *MessagesService) Stream(org, flow string, opt *MessagesListOptions) (chan Message, *http.Response, error) {
-	u := fmt.Sprintf("flows/%v/%v", org, flow)
-
-	u, err := addOptions(u, opt)
-	if err != nil {
-		return nil, nil, err
-	}
+func (s *MessagesService) Stream(token, org, flow string) (chan Message, *eventsource.EventSource, error) {
+	u := fmt.Sprintf("flows/%v/%v?access_token=%v", org, flow, token)
 
 	req, err := s.client.NewStreamRequest("GET", u, nil)
 	if err != nil {
@@ -43,12 +39,12 @@ func (s *MessagesService) Stream(org, flow string, opt *MessagesListOptions) (ch
 	}
 
 	messageStream := make(chan Message)
-	resp, err := s.client.Do(req, messageStream)
+	es, err := s.client.StreamDo(req, messageStream)
 	if err != nil {
-		return nil, resp, err
+		return nil, es, err
 	}
 
-	return messageStream, resp, err
+	return messageStream, es, err
 }
 
 // Lists the messages for the given flow.

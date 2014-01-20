@@ -5,8 +5,6 @@ import (
 	"github.com/wm/go-flowdock/auth"
 	"github.com/wm/go-flowdock/flowdock"
 	"log"
-	"github.com/bernerdschaefer/eventsource"
-	"time"
 	"code.google.com/p/goauth2/oauth"
 )
 
@@ -14,24 +12,21 @@ func main() {
 	httpClient := auth.AuthenticationRequest()
 	token, _ := oauth.CacheFile("cache.json").Token()
 	fmt.Println("Token:", token.AccessToken)
-	flow := fmt.Sprintf("flows/iora/egg?access_token=%v", token.AccessToken)
+	// flow := fmt.Sprintf("flows/iora/egg?access_token=%v", token.AccessToken)
 
 	client := flowdock.NewClient(httpClient)
 
-	req, _ := client.NewStreamRequest("GET", flow, nil)
-	es := eventsource.New(req, 3*time.Second)
 	messageList(client)
+	messageStream(client,token.AccessToken)
 
 	fmt.Println("Waiting for event")
+}
 
-	for i := 0; i < 10; i++ {
-		event, err := es.Read()
-		if err == nil {
-			fmt.Println(event.ID, event.Type, string(event.Data))
-			fmt.Println("And the event is:")
-		} else {
-			fmt.Println("And the error is:", err, req)
-		}
+func messageStream(client *flowdock.Client, token string) {
+	stream, _, _ := client.Messages.Stream(token, "iora", "egg")
+
+	for m := range stream {
+		fmt.Println(m)
 	}
 }
 

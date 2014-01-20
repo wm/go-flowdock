@@ -166,24 +166,30 @@ func (c *Client) StreamDo(req *http.Request, ch chan Message) (*eventsource.Even
 	// TODO make this configurable
 	retryDuration := 3*time.Second
 
+	var err error
 	es := eventsource.New(req, retryDuration)
-	event, err := es.Read()
+	go func() {
+		for {
+			event, err := es.Read()
 
-	if err != nil {
-		// even though there was an error, we still return the response
-		// in case the caller wants to inspect it further
-		return es, err
-	}
+			if err != nil {
+				// even though there was an error, we still return the response
+				// in case the caller wants to inspect it further
+				// return es, err
+				// TODO panic
+			}
 
-	if ch != nil {
-		// TODO: Remove the following code (used for JSON debugging)
-		// body, _ := ioutil.ReadAll(resp.Body)
-		// fmt.Println(string(body))
+			if ch != nil {
+				// TODO: Remove the following code (used for JSON debugging)
+				// body, _ := ioutil.ReadAll(resp.Body)
+				// fmt.Println(string(body))
 
-		m := new(Message)
-		err = json.Unmarshal([]byte(event.Data), m)
-		ch <- *m
-	}
+				m := new(Message)
+				err = json.Unmarshal([]byte(event.Data), m)
+				ch <- *m
+			}
+		}
+	}()
 	return es, err
 }
 

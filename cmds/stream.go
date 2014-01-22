@@ -21,7 +21,7 @@ func main() {
 }
 
 func messageStream(client *flowdock.Client, token string) {
-	stream, es, _ := client.Messages.Stream(token, "iora", "egg")
+	stream, es, _ := client.Messages.Stream(token, "iora", "tech-stuff")
 	defer es.Close()
 
 	for m := range stream {
@@ -30,8 +30,8 @@ func messageStream(client *flowdock.Client, token string) {
 }
 
 func messageList(client *flowdock.Client) {
-	opt := flowdock.MessagesListOptions{Limit: 100, Event: "message, comment"}
-	messages, _, err := client.Messages.List("iora", "egg", &opt)
+	opt := flowdock.MessagesListOptions{Limit: 100}
+	messages, _, err := client.Messages.List("iora", "tech-stuff", &opt)
 
 	if err != nil {
 		log.Fatal("Get:", err)

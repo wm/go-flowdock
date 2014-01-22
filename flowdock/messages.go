@@ -150,7 +150,7 @@ type Message struct {
 	ID               *int             `json:"id,omitempty"`
 	FlowID           *string          `json:"flow,omitempty"`
 	Sent             *Time            `json:"sent,omitempty"`
-	UserID           *json.RawMessage `json:"user,omitempty"`
+	UserID           *string          `json:"user,omitempty"`
 	Event            *string          `json:"event,omitempty"`
 	RawContent       *json.RawMessage `json:"content,omitempty"`
 	MessageID        *int             `json:"message,omitempty"`
@@ -165,49 +165,15 @@ type Message struct {
 // It can be a MessageContent, CommentContent, etc. Depends on the Event
 func (m *Message) Content() (content Content) {
 	switch *m.Event {
-	case "message":
-		content = new(MessageContent)
-		if err := json.Unmarshal([]byte(*m.RawContent), &content); err != nil {
-			panic(err.Error())
-		}
-	case "comment":
-		content = &CommentContent{}
-		if err := json.Unmarshal([]byte(*m.RawContent), &content); err != nil {
-			panic(err.Error())
-		}
-	// default:
-	// 	messageContent := MessageContent(string(*m.RawContent))
-	// 	content = &messageContent
+		case "message":  content = new(MessageContent)
+		case "comment":  content = &CommentContent{}
+		case "vcs":      content = &VcsContent{}
+		default:         content = new(JsonContent)
+	}
+
+	if err := json.Unmarshal([]byte(*m.RawContent), &content); err != nil {
+		panic(err.Error())
 	}
 
 	return content
-}
-
-// Content should be implemented by any value that is parsed into
-// Message.RawContent. Its API will likly expand as more Message types are
-// implemented.
-type Content interface {
-	String() string
-}
-
-// MessageContent represents a Message's Content when Message.Event is "message"
-type MessageContent string
-
-// Return the string version of a MessageContent
-//
-func (c *MessageContent) String() string {
-	return string(*c)
-}
-
-// CommentContent represents a Message's Content when Message.Event is "comment"
-type CommentContent struct {
-	Title *string `json:"title"`
-	Text  *string `json:"text"`
-}
-
-// Return the string version of a CommentContent
-//
-// It returns the *CommentContent.Text
-func (c *CommentContent) String() string {
-	return *c.Text
 }

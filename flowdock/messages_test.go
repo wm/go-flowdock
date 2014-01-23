@@ -7,6 +7,45 @@ import (
 	"testing"
 )
 
+func TestMessagesService_Stream(t *testing.T) {
+	setup()
+	defer teardown()
+	more := make(chan bool, 1)
+
+	mux.HandleFunc("/flows/org/flow", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testFormValues(t, r, values{"access_token": "token"})
+		w.Header().Set("Content-Type", "text/event-stream")
+
+		var id int
+
+		// send a message for each 'more'
+		for {
+			if !<-more {
+				break
+			}
+			
+			fmt.Fprintf(w, "id: %d\ndata: {\"event\":\"message\",\"content\":\"message %d\"}\n\n", id, id)
+			w.(responseWriter).Flush()
+			id++
+		}
+	})
+	defer close(more)
+
+	stream, _, err := client.Messages.Stream("token", "org", "flow")
+	more <- true // tell test server to send a message
+
+	if err != nil {
+		t.Errorf("Messages.Stream returned error: %v", err)
+	}
+
+	msg := <-stream
+
+	if msg.Content().String() != "message 0" {
+		t.Fatalf("expected message 0, got %v", msg.Content())
+	}
+}
+
 func TestMessagesService_List(t *testing.T) {
 	setup()
 	defer teardown()

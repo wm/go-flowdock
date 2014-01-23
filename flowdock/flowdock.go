@@ -14,8 +14,8 @@ import (
 
 const (
 	libraryVersion   = "0.0"
-	defaultBaseURL   = "https://api.flowdock.com/"
-	streamBaseURL    = "https://stream.flowdock.com/"
+	defaultRestURL   = "https://api.flowdock.com/"
+	defaultStreamURL = "https://stream.flowdock.com/"
 	userAgent        = "go-flowdock/" + libraryVersion
 	defaultMediaType = "application/json"
 )
@@ -26,7 +26,7 @@ type Client struct {
 	client *http.Client
 
 	// Base URL for API requests.
-	BaseURL *url.URL
+	RestURL *url.URL
 
 	// Streaming URL for API requests.
 	StreamURL *url.URL
@@ -48,12 +48,12 @@ func NewClient(httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
-	baseURL, _   := url.Parse(defaultBaseURL)
-	streamURL, _ := url.Parse(streamBaseURL)
+	baseURL, _   := url.Parse(defaultRestURL)
+	streamURL, _ := url.Parse(defaultStreamURL)
 
 	c := &Client{
 		client: httpClient,
-		BaseURL: baseURL,
+		RestURL: baseURL,
 		StreamURL: streamURL,
 		UserAgent: userAgent,
 	}
@@ -64,20 +64,13 @@ func NewClient(httpClient *http.Client) *Client {
 	return c
 }
 
-// NewRequest creates an API request. A relative URL can be provided in urlStr,
-// in which case it is resolved relative to the BaseURL of the Client.
-// Relative URLs should always be specified without a preceding slash. If
-// specified, the value pointed to by body is JSON encoded and included as the
-// request body.
-func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
-	// TODO: Remove this once the client is stable
-	// fmt.Println("url:", urlStr)
+func (c *Client) baseRequest(method, urlStr string, baseURL url.URL, body interface{}) (*http.Request, error) {
 	rel, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}
 
-	u := c.BaseURL.ResolveReference(rel)
+	u := baseURL.ResolveReference(rel)
 
 	buf := new(bytes.Buffer)
 	if body != nil {
@@ -97,36 +90,22 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 	return req, nil
 }
 
-// TODO DRY this up - this is just a dupe of the NewRequest.
+// NewRequest creates an API request. A relative URL can be provided in urlStr,
+// in which case it is resolved relative to the RestURL of the Client.
+// Relative URLs should always be specified without a preceding slash. If
+// specified, the value pointed to by body is JSON encoded and included as the
+// request body.
+func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
+	return c.baseRequest(method, urlStr, *c.RestURL, body)
+}
+
 // NewStreamRequest creates an API request. A relative URL can be provided in urlStr,
-// in which case it is resolved relative to the BaseURL of the Client.
+// in which case it is resolved relative to the StreamURL of the Client.
 // Relative URLs should always be specified without a preceding slash. If
 // specified, the value pointed to by body is JSON encoded and included as the
 // request body.
 func (c *Client) NewStreamRequest(method, urlStr string, body interface{}) (*http.Request, error) {
-	rel, err := url.Parse(urlStr)
-	if err != nil {
-		return nil, err
-	}
-
-	u := c.StreamURL.ResolveReference(rel)
-
-	buf := new(bytes.Buffer)
-	if body != nil {
-		err := json.NewEncoder(buf).Encode(body)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	req, err := http.NewRequest(method, u.String(), buf)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Accept", defaultMediaType)
-	req.Header.Add("User-Agent", c.UserAgent)
-	return req, nil
+	return c.baseRequest(method, urlStr, *c.StreamURL, body)
 }
 
 // Do sends an API request and returns the API response. The API response is
@@ -148,10 +127,6 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	}
 
 	if v != nil {
-		// TODO: Remove the following code (used for JSON debugging)
-		// body, _ := ioutil.ReadAll(resp.Body)
-		// fmt.Println(string(body))
-
 		err = json.NewDecoder(resp.Body).Decode(v)
 	}
 	return resp, err

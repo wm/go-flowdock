@@ -33,7 +33,6 @@ type MessagesListOptions struct {
 // Flowdock API docs: https://flowdock.com/api/streaming and 
 // https://www.flowdock.com/api/messages
 func (s *MessagesService) Stream(token, org, flow string) (chan Message, *eventsource.EventSource, error) {
-	// TODO make this configurable
 	retryDuration := 3*time.Second
 
 	u := fmt.Sprintf("flows/%v/%v?access_token=%v", org, flow, token)

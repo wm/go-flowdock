@@ -29,7 +29,7 @@ func TestMessagesService_List(t *testing.T) {
 			"event":"message",
 			"content": "Hello NYC",
 			"attachments": [],
-			"user":18
+			"user":"18"
 		  },
 		  {
 			"app": "chat",
@@ -41,7 +41,7 @@ func TestMessagesService_List(t *testing.T) {
 			"content": "Hello World",
 			"sent": 1317715340213,
 			"attachments": [],
-			"user": 2
+			"user": "2"
 		  }
 		]`)
 		fmt.Fprint(w, `[{"id":"1"}, {"id":"2"}]`)

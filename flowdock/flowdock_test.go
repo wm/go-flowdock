@@ -21,6 +21,9 @@ var (
 
 	// server is a test HTTP server used to provide mock API responses.
 	server *httptest.Server
+
+	// server is a test HTTP server used to provide mock Streaming API responses.
+	streamServer *httptest.Server
 )
 
 // setup sets up a test HTTP server along with a flowdock.Client that is
@@ -30,10 +33,12 @@ func setup() {
 	// test server
 	mux = http.NewServeMux()
 	server = httptest.NewServer(mux)
+	streamServer = httptest.NewServer(mux)
 
 	// flowdock client configured to use test server
 	client = NewClient(nil)
-	client.BaseURL, _ = url.Parse(server.URL)
+	client.RestURL, _ = url.Parse(server.URL)
+	client.StreamURL, _ = url.Parse(streamServer.URL)
 }
 
 // teardown closes the test HTTP server.
@@ -45,6 +50,12 @@ func testMethod(t *testing.T, r *http.Request, want string) {
 	if want != r.Method {
 		t.Errorf("Request method = %v, want %v", r.Method, want)
 	}
+}
+
+type responseWriter interface {
+	http.ResponseWriter
+	http.Flusher
+	http.CloseNotifier
 }
 
 type values map[string]string
@@ -63,8 +74,8 @@ func testFormValues(t *testing.T, r *http.Request, values values) {
 func TestNewClient(t *testing.T) {
 	c := NewClient(nil)
 
-	if c.BaseURL.String() != defaultBaseURL {
-		t.Errorf("NewClient BaseURL = %v, want %v", c.BaseURL.String(), defaultBaseURL)
+	if c.RestURL.String() != defaultRestURL {
+		t.Errorf("NewClient RestURL = %v, want %v", c.RestURL.String(), defaultRestURL)
 	}
 	if c.UserAgent != userAgent {
 		t.Errorf("NewClient UserAgent = %v, want %v", c.UserAgent, userAgent)
@@ -75,7 +86,7 @@ func TestNewRequest(t *testing.T) {
 	c := NewClient(nil)
 
 	name := "n"
-	inURL, outURL := "/foo", defaultBaseURL+"foo"
+	inURL, outURL := "/foo", defaultRestURL+"foo"
 	inBody, outBody := &Flow{Name: &name}, `{"name":"n"}`+"\n"
 	req, _ := c.NewRequest("GET", inURL, inBody)
 

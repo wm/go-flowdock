@@ -15,16 +15,13 @@ func main() {
 	// flowsCreate("iora", "wm-test-api", client)
 	// flowsUpdate("iora", "wm-test-api", client)
 
-	// flowsGet("iora", "culinary-extra", client)
-	// flowsGetById("iora:culinary-extra", client)
-	// flowsList(client)
+	flowsGet("iora", "culinary-extra", client)
+	flowsGetById("iora:culinary-extra", client)
+	flowsList(client)
 
-	// message := messagesCreate(client)
-	// messagesComment(client, *message.ID)
-
-
-	// messagesCreate(client)
-	// messageList(client)
+	message := messagesCreate(client)
+	messagesComment(client, *message.ID)
+	messageList(client)
 	// inboxMessage(client)
 }
 
@@ -84,7 +81,7 @@ func displayFlowData(flow flowdock.Flow) {
 
 func messageList(client *flowdock.Client) {
 	opt := flowdock.MessagesListOptions{Limit: 100, Event: "message, comment"}
-	messages, _, err := client.Messages.List("iora", "tech-stuff", &opt)
+	messages, _, err := client.Messages.List("iora", "egg", &opt)
 
 	if err != nil {
 		log.Fatal("Get:", err)
@@ -98,7 +95,6 @@ func messageList(client *flowdock.Client) {
 func displayMessageData(msg flowdock.Message) {
 	fmt.Println("MSG:", *msg.ID, *msg.Event, msg.Content())
 }
-
 
 func messagesCreate(client *flowdock.Client) *flowdock.Message {
 	opt := &flowdock.MessagesCreateOptions{FlowID: "iora:egg",
@@ -130,12 +126,13 @@ func messagesComment(client *flowdock.Client, messageID int) {
 
 // TODO: needs to be fixed (load token from file)
 func inboxMessage(client *flowdock.Client) *flowdock.Message {
-	opt := &flowdock.InboxCreateOptions{FlowID: "iora:egg",
-		Subject:      "IoraHealth/bouncah build #87 has failed!",
-		ExternalUserName:  "TeamCity CI",
-		FromAddress:  "build+ok@flowdock.com",
-		Source:       "go-flowdock",
-		Content:      `
+	opt := &flowdock.InboxCreateOptions{
+		Source:            "go-flowdock",
+		FromName:          "TeamCity CI",
+		Subject:           "IoraHealth/bouncah build #87 has failed!",
+		FromAddress:       "build+ok@flowdock.com",
+		Link:              "http://wil.io",
+		Content:           `
 <ul>
 	<li>
 		<code><a href="https://github.com/IoraHealth/bouncah">IoraHealth/bouncah</a> </code> build #100 has passed!
@@ -156,11 +153,10 @@ func inboxMessage(client *flowdock.Client) *flowdock.Message {
 		`,
 		Tags:         []string{"fail", "CI", "87"},
 	}
-	m, _, err := client.Inbox.Create(opt)
+	m, _, err := client.Inbox.Create("SOME_TOKEN", opt)
 	if err != nil {
 		log.Fatal("Get:", err)
 	}
-	displayMessageData(*m)
 
 	return m
 }

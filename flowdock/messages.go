@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"encoding/json"
 	"fmt"
+	"github.com/bernerdschaefer/eventsource"
+	"time"
 )
 
 // MessagesService handles communication with the messages related methods of
@@ -24,6 +26,40 @@ type MessagesListOptions struct {
 	Tags             []string `url:"tags,comma,omitempty"`
 	TagMode          string   `url:"tag_mode,omitempty"`
 	Search           string   `url:"search,omitempty"`
+}
+
+// Stream the messages for the given flow.
+//
+// Flowdock API docs: https://flowdock.com/api/streaming and 
+// https://www.flowdock.com/api/messages
+func (s *MessagesService) Stream(token, org, flow string) (chan Message, *eventsource.EventSource, error) {
+	retryDuration := 3*time.Second
+
+	u := fmt.Sprintf("flows/%v/%v?access_token=%v", org, flow, token)
+
+	req, err := s.client.NewStreamRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	messageCh := make(chan Message)
+	es := eventsource.New(req, retryDuration)
+
+	go func() {
+		for {
+			event, err := es.Read()
+
+			if err != nil {
+				// TODO panic or add error channel!
+			}
+
+			m := new(Message)
+			err = json.Unmarshal([]byte(event.Data), m)
+			messageCh <- *m
+		}
+	}()
+
+	return messageCh, es, err
 }
 
 // Lists the messages for the given flow.
@@ -113,7 +149,7 @@ type Message struct {
 	ID               *int             `json:"id,omitempty"`
 	FlowID           *string          `json:"flow,omitempty"`
 	Sent             *Time            `json:"sent,omitempty"`
-	UserID           *json.RawMessage `json:"user,omitempty"`
+	UserID           *string          `json:"user,omitempty"`
 	Event            *string          `json:"event,omitempty"`
 	RawContent       *json.RawMessage `json:"content,omitempty"`
 	MessageID        *int             `json:"message,omitempty"`
@@ -128,49 +164,15 @@ type Message struct {
 // It can be a MessageContent, CommentContent, etc. Depends on the Event
 func (m *Message) Content() (content Content) {
 	switch *m.Event {
-	case "message":
-		content = new(MessageContent)
-		if err := json.Unmarshal([]byte(*m.RawContent), &content); err != nil {
-			panic(err.Error())
-		}
-	case "comment":
-		content = &CommentContent{}
-		if err := json.Unmarshal([]byte(*m.RawContent), &content); err != nil {
-			panic(err.Error())
-		}
-	// default:
-	// 	messageContent := MessageContent(string(*m.RawContent))
-	// 	content = &messageContent
+		case "message":  content = new(MessageContent)
+		case "comment":  content = &CommentContent{}
+		case "vcs":      content = &VcsContent{}
+		default:         content = new(JsonContent)
+	}
+
+	if err := json.Unmarshal([]byte(*m.RawContent), &content); err != nil {
+		panic(err.Error())
 	}
 
 	return content
-}
-
-// Content should be implemented by any value that is parsed into
-// Message.RawContent. Its API will likly expand as more Message types are
-// implemented.
-type Content interface {
-	String() string
-}
-
-// MessageContent represents a Message's Content when Message.Event is "message"
-type MessageContent string
-
-// Return the string version of a MessageContent
-//
-func (c *MessageContent) String() string {
-	return string(*c)
-}
-
-// CommentContent represents a Message's Content when Message.Event is "comment"
-type CommentContent struct {
-	Title *string `json:"title"`
-	Text  *string `json:"text"`
-}
-
-// Return the string version of a CommentContent
-//
-// It returns the *CommentContent.Text
-func (c *CommentContent) String() string {
-	return *c.Text
 }

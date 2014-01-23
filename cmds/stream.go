@@ -22,10 +22,17 @@ func main() {
 
 func messageStream(client *flowdock.Client, token string) {
 	stream, es, _ := client.Messages.Stream(token, "iora", "tech-stuff")
+	stream1, es1, _ := client.Messages.Stream(token, "iora", "technical-discussions")
 	defer es.Close()
+	defer es1.Close()
 
-	for m := range stream {
-		displayMessageData(m)
+	for {
+		select {
+		case msg := <-stream:
+			displayMessageData(msg, "wc")
+		case msg1 := <-stream1:
+			displayMessageData(msg1, "td")
+		}
 	}
 }
 
@@ -38,10 +45,26 @@ func messageList(client *flowdock.Client) {
 	}
 
 	for _, msg := range messages {
-		displayMessageData(msg)
+		displayMessageData(msg, "wc")
 	}
 }
 
-func displayMessageData(msg flowdock.Message) {
-	fmt.Println("MSG:", *msg.ID, *msg.Event, msg.Content())
+func displayMessageData(msg flowdock.Message, room string) {
+	events := []string{"activity.user", "mail", "zendesk", "twitter", "tag-change"}
+	if stringNotInSlice(*msg.Event, events) {
+		fmt.Println("MSG:", room, *msg.ID, *msg.Event, msg.Content())
+	}
+}
+
+func stringInSlice(a string, list []string) bool {
+    for _, b := range list {
+        if b == a {
+            return true
+        }
+    }
+    return false
+}
+
+func stringNotInSlice(a string, list []string) bool {
+	return !stringInSlice(a, list)
 }

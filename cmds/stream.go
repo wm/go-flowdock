@@ -50,9 +50,9 @@ func messageList(client *flowdock.Client) {
 }
 
 func displayMessageData(msg flowdock.Message, room string) {
-	events := []string{"activity.user", "mail", "zendesk", "twitter", "tag-change"}
+	events := []string{"user-edit", "file", "activity.user", "mail", "zendesk", "twitter", "tag-change"}
 	if stringNotInSlice(*msg.Event, events) {
-		fmt.Println("MSG:", room, *msg.ID, *msg.Event, msg.Content())
+		fmt.Println("\nMSG:", room, *msg.ID, *msg.Event, msg.Content())
 	}
 }
 

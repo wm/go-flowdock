@@ -26,6 +26,8 @@ func (c *MessageContent) String() string {
 type JsonContent string
 
 // Unmarshal the json data into JsonContent (i.e. just a string really)
+//
+// This just casts a byte data into a JsonContent
 func (c *JsonContent) UnmarshalJSON(data []byte) error {
 	*c = JsonContent(data)
 	return nil

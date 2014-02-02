@@ -22,7 +22,7 @@ var (
 	// server is a test HTTP server used to provide mock API responses.
 	server *httptest.Server
 
-	// server is a test HTTP server used to provide mock Streaming API responses.
+	// server is a test HTTP server used to provide mock API responses.
 	streamServer *httptest.Server
 )
 
@@ -44,6 +44,7 @@ func setup() {
 // teardown closes the test HTTP server.
 func teardown() {
 	server.Close()
+	streamServer.Close()
 }
 
 func testMethod(t *testing.T, r *http.Request, want string) {

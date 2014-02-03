@@ -1,13 +1,49 @@
 package flowdock
 
+import (
+	"net/http"
+)
+
+// UsersService handles communication with the user related methods of the
+// Flowdock API.
+//
+// Flowdock API docs: https://www.flowdock.com/api/users
+type UsersService struct {
+	client *Client
+}
+
 type User struct {
-	id            *string
-	nick          *string
-	name          *string
-	email         *string
-	avatar        *string
-	status        *string
-	disabled      *bool
-	last_activity *Time
-	last_ping     *Time
+	ID            *string  `json:"id,omitempty"`
+	Nick          *string  `json:"nick,omitempty"`
+	Name          *string  `json:"name,omitempty"`
+	Email         *string  `json:"email,omitempty"`
+	Avatar        *string  `json:"avatar,omitempty"`
+	Status        *string  `json:"status,omitempty"`
+	Disabled      *bool    `json:"disabled,omitempty"`
+	LastActivity  *Time    `json:"last_activity,omitempty"`
+	LastPing      *Time    `json:"last_ping,omitempty"`
+}
+
+// List all users visible to the authenticated user, i.e. a combined set of
+// users from all the organizations of the authenticated user. If the
+// authenticated user is an admin in an organization, all of that
+// organization's users are returned. Otherwise, only users that are in the
+// same flows as the authenticated user are returned.
+//
+// Flowdock API docs: https://www.flowdock.com/api/users
+func (s *UsersService) List() ([]User, *http.Response, error) {
+	u := "/users"
+
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	users := new([]User)
+	resp, err := s.client.Do(req, users)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return *users, resp, err
 }

@@ -72,6 +72,7 @@ func testFormValues(t *testing.T, r *http.Request, values values) {
 		t.Errorf("Request parameters = %v, want %v", r.Form, want)
 	}
 }
+
 func TestNewClient(t *testing.T) {
 	c := NewClient(nil)
 

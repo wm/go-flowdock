@@ -48,7 +48,7 @@ func userList(client *flowdock.Client) {
 		log.Fatal("Get:", err)
 	}
 
-	for _, user := range allUsers {
+	for _, user := range *allUsers {
 		id := strconv.Itoa(*user.ID)
 		users[id] = user
 	}

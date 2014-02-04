@@ -2,6 +2,7 @@ package flowdock
 
 import (
 	"net/http"
+	"fmt"
 )
 
 // UsersService handles communication with the user related methods of the
@@ -31,7 +32,7 @@ type User struct {
 // same flows as the authenticated user are returned.
 //
 // Flowdock API docs: https://www.flowdock.com/api/users
-func (s *UsersService) List() ([]User, *http.Response, error) {
+func (s *UsersService) List() (*[]User, *http.Response, error) {
 	u := "/users"
 
 	req, err := s.client.NewRequest("GET", u, nil)
@@ -45,5 +46,23 @@ func (s *UsersService) List() ([]User, *http.Response, error) {
 		return nil, resp, err
 	}
 
-	return *users, resp, err
+	return users, resp, err
+}
+
+// Flowdock API docs: https://www.flowdock.com/api/users
+func (s *UsersService) Get(id int) (*User, *http.Response, error) {
+	u := fmt.Sprintf("/users/%v", id)
+
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	user := new(User)
+	resp, err := s.client.Do(req, user)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return user, resp, err
 }

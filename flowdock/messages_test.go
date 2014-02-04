@@ -24,7 +24,7 @@ func TestMessagesService_Stream(t *testing.T) {
 			if !<-more {
 				break
 			}
-			
+
 			fmt.Fprintf(w, "id: %d\ndata: {\"event\":\"message\",\"content\":\"message %d\"}\n\n", id, id)
 			w.(responseWriter).Flush()
 			id++

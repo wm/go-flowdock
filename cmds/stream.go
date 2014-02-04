@@ -6,7 +6,11 @@ import (
 	"github.com/wm/go-flowdock/flowdock"
 	"log"
 	"code.google.com/p/goauth2/oauth"
+	"strconv"
 )
+
+var users = map[string]flowdock.User{}
+var nilUser = flowdock.User{Nick: new(string), ID: new(int)}
 
 func main() {
 	httpClient := auth.AuthenticationRequest()
@@ -14,6 +18,7 @@ func main() {
 
 	client := flowdock.NewClient(httpClient)
 
+	userList(client)
 	messageList(client)
 	messageStream(client,token.AccessToken)
 
@@ -36,6 +41,31 @@ func messageStream(client *flowdock.Client, token string) {
 	}
 }
 
+func userList(client *flowdock.Client) {
+	allUsers, _, err := client.Users.List()
+
+	if err != nil {
+		log.Fatal("Get:", err)
+	}
+
+	for _, user := range allUsers {
+		id := strconv.Itoa(*user.ID)
+		users[id] = user
+	}
+}
+
+func getUser(userID string) (flowdock.User, error) {
+	var err error
+	user := users[userID]
+	if user.ID == nil {
+		// TODO
+		// user, err = fetchUser(userId)
+		user = nilUser
+	}
+
+	return user, err
+}
+
 func messageList(client *flowdock.Client) {
 	opt := flowdock.MessagesListOptions{Limit: 100}
 	messages, _, err := client.Messages.List("iora", "tech-stuff", &opt)
@@ -52,7 +82,8 @@ func messageList(client *flowdock.Client) {
 func displayMessageData(msg flowdock.Message, room string) {
 	events := []string{"user-edit", "file", "activity.user", "mail", "zendesk", "twitter", "tag-change"}
 	if stringNotInSlice(*msg.Event, events) {
-		fmt.Println("\nMSG:", room, *msg.ID, *msg.Event, msg.Content())
+		user, _ := getUser(*msg.UserID)
+		fmt.Println("\nMSG:", room, *msg.ID, *user.Nick, *msg.Event, msg.Content())
 	}
 }
 

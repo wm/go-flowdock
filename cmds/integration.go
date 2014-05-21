@@ -98,9 +98,9 @@ func displayMessageData(msg flowdock.Message) {
 
 func messagesCreate(client *flowdock.Client) *flowdock.Message {
 	opt := &flowdock.MessagesCreateOptions{FlowID: "iora:egg",
-		Event: "message",
+		Event:   "message",
 		Content: "Howdy-Doo @dd #awesome",
-		Tags:  []string{"test", ":#api:", "@wm"},
+		Tags:    []string{"test", ":#api:", "@wm"},
 	}
 	m, _, err := client.Messages.Create(opt)
 	if err != nil {
@@ -113,9 +113,9 @@ func messagesCreate(client *flowdock.Client) *flowdock.Message {
 
 func messagesComment(client *flowdock.Client, messageID int) {
 	opt := &flowdock.MessagesCreateOptions{FlowID: "iora:egg",
-	    MessageID: messageID,
-		Event: "comment",
-		Content: "Commenting yo!",
+		MessageID: messageID,
+		Event:     "comment",
+		Content:   "Commenting yo!",
 	}
 	m, _, err := client.Messages.CreateComment(opt)
 	if err != nil {
@@ -127,12 +127,12 @@ func messagesComment(client *flowdock.Client, messageID int) {
 // TODO: needs to be fixed (load token from file)
 func inboxMessage(client *flowdock.Client) *flowdock.Message {
 	opt := &flowdock.InboxCreateOptions{
-		Source:            "go-flowdock",
-		FromName:          "TeamCity CI",
-		Subject:           "IoraHealth/bouncah build #87 has failed!",
-		FromAddress:       "build+ok@flowdock.com",
-		Link:              "http://wil.io",
-		Content:           `
+		Source:      "go-flowdock",
+		FromName:    "TeamCity CI",
+		Subject:     "IoraHealth/bouncah build #87 has failed!",
+		FromAddress: "build+ok@flowdock.com",
+		Link:        "http://wil.io",
+		Content: `
 <ul>
 	<li>
 		<code><a href="https://github.com/IoraHealth/bouncah">IoraHealth/bouncah</a> </code> build #100 has passed!
@@ -151,7 +151,7 @@ func inboxMessage(client *flowdock.Client) *flowdock.Message {
 	</li>
 </ul>
 		`,
-		Tags:         []string{"fail", "CI", "87"},
+		Tags: []string{"fail", "CI", "87"},
 	}
 	m, _, err := client.Inbox.Create("SOME_TOKEN", opt)
 	if err != nil {

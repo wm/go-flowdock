@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/wm/go-flowdock/flowdock"
-	"github.com/codegangsta/cli"
 	"code.google.com/p/goauth2/oauth"
 	"fmt"
-	"net/http"
+	"github.com/codegangsta/cli"
+	"github.com/wm/go-flowdock/flowdock"
 	"log"
+	"net/http"
 	"os"
 	"sort"
 )
@@ -22,15 +22,15 @@ the file specified by -cache and you may run without the -id and -secret flags.
 `
 
 type Query struct {
-     Tags   []string
-     Org    string
-     Flow   string
+	Tags []string
+	Org  string
+	Flow string
 }
 
 type AppDeployCount struct {
-	Project       string
-	Total         int
-	DeployCount   *map[string]int
+	Project     string
+	Total       int
+	DeployCount *map[string]int
 }
 
 const limit = 100
@@ -41,7 +41,7 @@ const limit = 100
 func main() {
 	app := cli.NewApp()
 
-	app.Flags = []cli.Flag {
+	app.Flags = []cli.Flag{
 		cli.StringFlag{"id", "", "Client ID"},
 		cli.StringFlag{"secret", "", "Client Secret"},
 		cli.StringFlag{"redirect_url", "urn:ietf:wg:oauth:2.0:oob", "Redirect URL"},
@@ -70,7 +70,7 @@ func main() {
 		channel := make(chan AppDeployCount, len([]string(args)))
 
 		for _, app := range []string(args) {
-			tags   := []string{
+			tags := []string{
 				"deployment",
 				"deploy_end",
 				c.String("environment"),
@@ -94,9 +94,9 @@ func getAppDeployCount(q Query, client *flowdock.Client, channel chan AppDeployC
 		app := q.Tags[len(q.Tags)-1]
 		opt := flowdock.MessagesListOptions{Limit: 100, TagMode: "and"}
 
-		opt.Tags   = q.Tags
+		opt.Tags = q.Tags
 		opt.Search = "production to production"
-		opt.Event  = "mail"
+		opt.Event = "mail"
 
 		messages, _, err := client.Messages.List(q.Org, q.Flow, &opt)
 
@@ -118,13 +118,13 @@ func getAppDeployCount(q Query, client *flowdock.Client, channel chan AppDeployC
 			removeEarliestMonth(&deployCount)
 		}
 
-		channel <- AppDeployCount{app, total, &deployCount} 
+		channel <- AppDeployCount{app, total, &deployCount}
 	}()
 }
 
 func removeEarliestMonth(displayCount *map[string]int) {
 	sortedKeys := sortedKeys(displayCount)
-	firstKey   := (*sortedKeys)[0]
+	firstKey := (*sortedKeys)[0]
 	delete(*displayCount, firstKey)
 }
 
@@ -147,21 +147,21 @@ func displayAppDeployCount(adcChan <-chan AppDeployCount) {
 }
 
 func stringInSlice(a string, list []string) bool {
-    for _, b := range list {
-        if b == a {
-            return true
-        }
-    }
-    return false
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }
 
-func sortedKeys(m *map[string]int) *[]string  {
-    mk := make([]string, len(*m))
-    i := 0
-    for k, _ := range *m {
-        mk[i] = k
-        i++
-    }
+func sortedKeys(m *map[string]int) *[]string {
+	mk := make([]string, len(*m))
+	i := 0
+	for k, _ := range *m {
+		mk[i] = k
+		i++
+	}
 	sort.Strings(mk)
 	return &mk
 }

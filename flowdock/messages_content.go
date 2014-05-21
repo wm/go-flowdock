@@ -69,7 +69,7 @@ type VcsContent struct {
 	Repository struct {
 		Name *string `json:"name"`
 	} `json:"repository,omitempty"`
-	Event *string `json:"event,omitempty"`
+	Event      *string `json:"event,omitempty"`
 	CompareUrl *string `json:"compare,omitempty"`
 }
 
@@ -79,7 +79,7 @@ type VcsContent struct {
 func (c *VcsContent) String() string {
 	var user, url string
 	event := *c.Event
-	name  := *c.Repository.Name
+	name := *c.Repository.Name
 
 	if c.Pusher.Name != nil {
 		user = *c.Pusher.Name

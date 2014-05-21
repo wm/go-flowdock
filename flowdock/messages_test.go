@@ -24,7 +24,7 @@ func TestMessagesService_Stream(t *testing.T) {
 			if !<-more {
 				break
 			}
-			
+
 			fmt.Fprintf(w, "id: %d\ndata: {\"event\":\"message\",\"content\":\"message %d\"}\n\n", id, id)
 			w.(responseWriter).Flush()
 			id++
@@ -49,11 +49,11 @@ func TestMessagesService_Stream(t *testing.T) {
 func TestMessagesService_List(t *testing.T) {
 	setup()
 	defer teardown()
-	var idOne      = 3816534
-	var eventOne   = "message"
-	var content    = []string{"Hello NYC", "Hello World"}
-	var idTwo      = 45590
-	var eventTwo   = "message"
+	var idOne = 3816534
+	var eventOne = "message"
+	var content = []string{"Hello NYC", "Hello World"}
+	var idTwo = 45590
+	var eventTwo = "message"
 
 	mux.HandleFunc("/flows/org/flow/messages", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -93,11 +93,11 @@ func TestMessagesService_List(t *testing.T) {
 
 	want := []Message{
 		{
-			ID: &idOne,
+			ID:    &idOne,
 			Event: &eventOne,
 		},
 		{
-			ID: &idTwo,
+			ID:    &idTwo,
 			Event: &eventTwo,
 		},
 	}
@@ -131,7 +131,7 @@ func TestMessagesService_Create_message(t *testing.T) {
 	})
 
 	opt := MessagesCreateOptions{
-		Event: "message",
+		Event:   "message",
 		Content: "Howdy-Doo @Jackie #awesome",
 	}
 	message, _, err := client.Messages.Create(&opt)
@@ -164,7 +164,7 @@ func TestMessagesService_Create_comment(t *testing.T) {
 	})
 
 	opt := MessagesCreateOptions{
-		Event: "comment",
+		Event:   "comment",
 		Content: "This is a comment",
 	}
 	message, _, err := client.Messages.CreateComment(&opt)
@@ -176,9 +176,9 @@ func TestMessagesService_Create_comment(t *testing.T) {
 		t.Errorf("Messages.Create returned %+v, want %+v", message.Event, message.Event)
 	}
 
-	title          := "Title of parent"
-	text           := "This is a comment"
-	content        := CommentContent{Title: &title, Text: &text}
+	title := "Title of parent"
+	text := "This is a comment"
+	content := CommentContent{Title: &title, Text: &text}
 	messageContent := message.Content()
 	if !reflect.DeepEqual(messageContent, &content) {
 		t.Errorf("Messages.Create returned %+v, want %+v", messageContent, &content)
@@ -186,12 +186,12 @@ func TestMessagesService_Create_comment(t *testing.T) {
 }
 
 func TestCommentContent_String(t *testing.T) {
-	title   := "Title of parent"
-	text    := "This is a comment"
+	title := "Title of parent"
+	text := "This is a comment"
 	content := CommentContent{Title: &title, Text: &text}
 
-	want    := "This is a comment"
-	if (*content.Text != want) {
+	want := "This is a comment"
+	if *content.Text != want {
 		t.Errorf("Messages.Create returned %+v, want %+v", *content.Text, want)
 	}
 }

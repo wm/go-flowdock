@@ -1,8 +1,8 @@
 package flowdock
 
 import (
-	"time"
 	"strconv"
+	"time"
 )
 
 // Time represents a Flowdock time stamp which is milliseconds since Epoch
@@ -21,7 +21,7 @@ func (t *Time) UnmarshalJSON(b []byte) error {
 	}
 
 	// convert the unix epoch to a Time object
-	t.Time = time.Time(time.Unix(result / 1000, 0))
+	t.Time = time.Time(time.Unix(result/1000, 0))
 
 	return nil
 }

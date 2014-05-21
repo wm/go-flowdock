@@ -1,10 +1,10 @@
 package flowdock
 
 import (
-	"net/http"
 	"encoding/json"
 	"fmt"
 	"github.com/bernerdschaefer/eventsource"
+	"net/http"
 	"time"
 )
 
@@ -19,21 +19,21 @@ type MessagesService struct {
 // MessagesListOptions specifies the optional parameters to the
 // MessageService.List method.
 type MessagesListOptions struct {
-	Event            string   `url:"event,omitempty"`
-	Limit            int      `url:"limit,omitempty"`
-	SinceId          int      `url:"since_id,omitempty"`
-	UntilId          int      `url:"until_id,omitempty"`
-	Tags             []string `url:"tags,comma,omitempty"`
-	TagMode          string   `url:"tag_mode,omitempty"`
-	Search           string   `url:"search,omitempty"`
+	Event   string   `url:"event,omitempty"`
+	Limit   int      `url:"limit,omitempty"`
+	SinceId int      `url:"since_id,omitempty"`
+	UntilId int      `url:"until_id,omitempty"`
+	Tags    []string `url:"tags,comma,omitempty"`
+	TagMode string   `url:"tag_mode,omitempty"`
+	Search  string   `url:"search,omitempty"`
 }
 
 // Stream the messages for the given flow.
 //
-// Flowdock API docs: https://flowdock.com/api/streaming and 
+// Flowdock API docs: https://flowdock.com/api/streaming and
 // https://www.flowdock.com/api/messages
 func (s *MessagesService) Stream(token, org, flow string) (chan Message, *eventsource.EventSource, error) {
-	retryDuration := 3*time.Second
+	retryDuration := 3 * time.Second
 
 	u := fmt.Sprintf("flows/%v/%v?access_token=%v", org, flow, token)
 
@@ -164,10 +164,14 @@ type Message struct {
 // It can be a MessageContent, CommentContent, etc. Depends on the Event
 func (m *Message) Content() (content Content) {
 	switch *m.Event {
-		case "message":  content = new(MessageContent)
-		case "comment":  content = &CommentContent{}
-		case "vcs":      content = &VcsContent{}
-		default:         content = new(JsonContent)
+	case "message":
+		content = new(MessageContent)
+	case "comment":
+		content = &CommentContent{}
+	case "vcs":
+		content = &VcsContent{}
+	default:
+		content = new(JsonContent)
 	}
 
 	if err := json.Unmarshal([]byte(*m.RawContent), &content); err != nil {

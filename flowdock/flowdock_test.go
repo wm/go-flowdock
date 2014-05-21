@@ -72,6 +72,7 @@ func testFormValues(t *testing.T, r *http.Request, values values) {
 		t.Errorf("Request parameters = %v, want %v", r.Form, want)
 	}
 }
+
 func TestNewClient(t *testing.T) {
 	c := NewClient(nil)
 
@@ -80,6 +81,19 @@ func TestNewClient(t *testing.T) {
 	}
 	if c.UserAgent != userAgent {
 		t.Errorf("NewClient UserAgent = %v, want %v", c.UserAgent, userAgent)
+	}
+}
+
+func TestNewClientWithToken(t *testing.T) {
+	token := "not-real-token"
+	c := NewClientWithToken(nil, token)
+
+	url := fmt.Sprintf(tokenRestURL, token)
+	if c.RestURL.String() != url {
+		t.Errorf("NewClientWithToken RestURL = %v, want %v", c.RestURL.String(), url)
+	}
+	if c.UserAgent != userAgent {
+		t.Errorf("NewClientWithToken UserAgent = %v, want %v", c.UserAgent, userAgent)
 	}
 }
 

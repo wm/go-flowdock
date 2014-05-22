@@ -16,6 +16,8 @@ const (
 	libraryVersion   = "0.0"
 	defaultRestURL   = "https://api.flowdock.com/"
 	defaultStreamURL = "https://stream.flowdock.com/"
+	tokenRestURL     = "https://%s@api.flowdock.com/"
+	tokenStreamURL   = "https://%s@stream.flowdock.com/"
 	userAgent        = "go-flowdock/" + libraryVersion
 	defaultMediaType = "application/json"
 )
@@ -35,9 +37,23 @@ type Client struct {
 	UserAgent string
 
 	// Services used for talking to different parts of the Flowdock API.
-	Flows *FlowsService
+	Flows    *FlowsService
 	Messages *MessagesService
-	Inbox *InboxService
+	Inbox    *InboxService
+}
+
+func newClient(httpClient *http.Client, baseURL, streamURL *url.URL) *Client {
+	c := &Client{
+		client:    httpClient,
+		RestURL:   baseURL,
+		StreamURL: streamURL,
+		UserAgent: userAgent,
+	}
+
+	c.Flows = &FlowsService{client: c}
+	c.Messages = &MessagesService{client: c}
+	c.Inbox = &InboxService{client: c}
+	return c
 }
 
 // NewClient returns a new Flowdock API client. If a nil httpClient is provided,
@@ -48,20 +64,20 @@ func NewClient(httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
-	baseURL, _   := url.Parse(defaultRestURL)
+	baseURL, _ := url.Parse(defaultRestURL)
 	streamURL, _ := url.Parse(defaultStreamURL)
+	return newClient(httpClient, baseURL, streamURL)
+}
 
-	c := &Client{
-		client: httpClient,
-		RestURL: baseURL,
-		StreamURL: streamURL,
-		UserAgent: userAgent,
+// NewClientWithToken returns a new Flowdock API client instantiated with a
+// personal token.  Works the same way as NewClient.
+func NewClientWithToken(httpClient *http.Client, token string) *Client {
+	if httpClient == nil {
+		httpClient = http.DefaultClient
 	}
-
-	c.Flows = &FlowsService{client: c}
-	c.Messages = &MessagesService{client: c}
-	c.Inbox = &InboxService{client: c}
-	return c
+	baseURL, _ := url.Parse(fmt.Sprintf(tokenRestURL, token))
+	streamURL, _ := url.Parse(fmt.Sprintf(tokenStreamURL, token))
+	return newClient(httpClient, baseURL, streamURL)
 }
 
 func (c *Client) baseRequest(method, urlStr string, baseURL url.URL, body interface{}) (*http.Request, error) {

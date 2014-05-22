@@ -1,8 +1,8 @@
 package flowdock
 
 import (
-	"time"
 	"testing"
+	"time"
 )
 
 func TestTime_UnmarshalJSON(t *testing.T) {

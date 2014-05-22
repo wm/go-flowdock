@@ -12,8 +12,8 @@ func main() {
 	client := flowdock.NewClient(auth.AuthenticationRequest())
 
 	search := "production to production"
-	tags   := []string{"deployment", "deploy_end", "production", "icis"}
-	event  := "mail"
+	tags := []string{"deployment", "deploy_end", "production", "icis"}
+	event := "mail"
 	messageSearch(&tags, &event, &search, client)
 }
 

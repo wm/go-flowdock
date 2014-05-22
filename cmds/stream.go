@@ -1,11 +1,11 @@
 package main
 
 import (
+	"code.google.com/p/goauth2/oauth"
 	"fmt"
 	"github.com/wm/go-flowdock/auth"
 	"github.com/wm/go-flowdock/flowdock"
 	"log"
-	"code.google.com/p/goauth2/oauth"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 	client := flowdock.NewClient(httpClient)
 
 	messageList(client)
-	messageStream(client,token.AccessToken)
+	messageStream(client, token.AccessToken)
 
 	fmt.Println("Waiting for event")
 }
@@ -57,12 +57,12 @@ func displayMessageData(msg flowdock.Message, room string) {
 }
 
 func stringInSlice(a string, list []string) bool {
-    for _, b := range list {
-        if b == a {
-            return true
-        }
-    }
-    return false
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }
 
 func stringNotInSlice(a string, list []string) bool {

@@ -37,9 +37,11 @@ type Client struct {
 	UserAgent string
 
 	// Services used for talking to different parts of the Flowdock API.
-	Flows    *FlowsService
-	Messages *MessagesService
-	Inbox    *InboxService
+	Flows         *FlowsService
+	Messages      *MessagesService
+	Users         *UsersService
+	Organizations *OrganizationsService
+	Inbox         *InboxService
 }
 
 func newClient(httpClient *http.Client, baseURL, streamURL *url.URL) *Client {
@@ -53,6 +55,8 @@ func newClient(httpClient *http.Client, baseURL, streamURL *url.URL) *Client {
 	c.Flows = &FlowsService{client: c}
 	c.Messages = &MessagesService{client: c}
 	c.Inbox = &InboxService{client: c}
+	c.Users = &UsersService{client: c}
+	c.Organizations = &OrganizationsService{client: c}
 	return c
 }
 

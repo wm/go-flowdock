@@ -100,6 +100,7 @@ type MessagesCreateOptions struct {
 	Subject          string   `url:"subject,omitempty"`
 	FromAddress      string   `url:"from_address,omitempty"`
 	Source           string   `url:"source,omitempty"`
+	ThreadId         string   `url:"thread_id,omitempty"`
 }
 
 // Create a comment for the specified organization
@@ -157,6 +158,7 @@ type Message struct {
 	UUID             *string          `json:"uuid,omitempty"`
 	ExternalUserName *string          `json:"external_user_name,omitempty"`
 	App              *string          `json:"app,omitempty"` // deprecated
+	ThreadId         *string          `json:"thread_id,omitempty"`
 }
 
 // Return the content of a Message

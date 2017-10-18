@@ -36,7 +36,7 @@ func TestUsersService_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/users/orgname/flowname/users", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/flows/orgname/flowname/users", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		fmt.Fprint(w, `[{"id":1}, {"id":2}]`)
 	})

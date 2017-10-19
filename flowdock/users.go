@@ -38,7 +38,7 @@ func (s *UsersService) All() ([]User, *http.Response, error) {
 //
 // Flowdock API docs: https://www.flowdock.com/api/users
 func (s *UsersService) List(org, flow string) ([]User, *http.Response, error) {
-	u := fmt.Sprintf("users/%v/%v/users", org, flow)
+	u := fmt.Sprintf("flows/%v/%v/users", org, flow)
 
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
